@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% for item in items %}
+  <a href="/product/{{ item['id'] }}/">
+    <img src="{{ item['variants']['Medium']['img_source'] }}"><br/>
+    Photo by {{ item['owner']['real_name'] or item['owner']['user_name']}}<br/><br/>
+  </a>
+  {% end %}
+{% end %}

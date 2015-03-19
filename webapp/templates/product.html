@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <img src="{{ item['variants']['Large']['img_source'] }}"><br/>
+  Photo by {{ item['owner']['real_name'] or item['owner']['user_name']}}<br/><br/>
+{% end %}
