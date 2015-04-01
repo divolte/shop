@@ -47,6 +47,15 @@ def merge_items(*input):
 
     return result
 
+def with_price(item, min_favs, max_favs):
+    r = (max_favs - min_favs + 1) / 2.0
+    result = {
+        'price': int((item['favs'] - min_favs) / r) + 1
+    }
+    result.update(item)
+
+    return result
+
 def main(args):
     print('Items from:\n\t%s' % '\n\t'.join(args.files))
 
@@ -57,8 +66,12 @@ def main(args):
         for line in open(fn).readlines()]
         for fn in args.files])
 
+    min_favs = min([item['favs'] for item in item_list])
+    max_favs = max([item['favs'] for item in item_list])
+    priced_item_list = [with_price(item, min_favs, max_favs) for item in item_list]
+
     items = {}
-    for item in item_list:
+    for item in priced_item_list:
         items[item['id']] = merge_items(item, items.get(item['id']))
 
     responses = Counter()

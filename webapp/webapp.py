@@ -4,10 +4,16 @@ import os
 
 from handlers import *
 
+import config
+
 routes = [
-    (r'/', HomepageHandler),
-    (r'/category/([a-z]+)/([0-9]{1,2})?', CategoryHandler),
-    (r'/product/([0-9]{10,15})/', ProductHandler)
+    web.URLSpec(r'/', HomepageHandler, { 'config': config }),
+    web.URLSpec(r'/category/([a-z]+)/(?:([0-9]{1,3})/)?', CategoryHandler, { 'config': config }),
+    web.URLSpec(r'/product/([0-9]{6,15})/', ProductHandler, { 'config': config }),
+    web.URLSpec(r'/basket/', BasketHandler, { 'config': config }),
+    web.URLSpec(r'/checkout/', CheckoutHandler, { 'config': config }),
+    web.URLSpec(r'/captcha/([0-9]{1,3})/', ImageHandler, { 'config': config }),
+    web.URLSpec(r'/download/([a-f0-9]{32,60})/', DownloadHandler, { 'config': config })
 ]
 
 def main(args):

@@ -1,10 +1,65 @@
 {% extends "base.html" %}
 
 {% block content %}
-  {% for item in items %}
-  <a href="/product/{{ item['id'] }}/">
-    <img src="{{ item['variants']['Medium']['img_source'] }}"><br/>
-    Photo by {{ item['owner']['real_name'] or item['owner']['user_name']}}<br/><br/>
-  </a>
+{% include add-to-basket.html %}
+
+  {% for row in grouper(items, 3) %}
+    <div class="row">
+    {% for item in row %}
+      <div class="col-md-2 text-center">
+        {% if item %}
+        <a href="/product/{{ item['id'] }}/">
+          <img src="{{ item['variants']['Large Square']['img_source'] }}" class="img-responsive img-thumbnail"><br/>
+          Photo by {{ item['owner']['real_name'] or item['owner']['user_name']}}<br/><br/>
+        </a>
+      </div>
+      <div class="col-md-2">
+        <span class="price">{{ item['price'] }} CAPTCHA {{ 'point' if item['price'] == 1 else 'points' }}</span><br/>
+        <span class="availability">Available in {% raw '%d&times;%d' % max([(v['width'],v['height']) for v in item['variants'].values()]) %}.</span><br/>
+        <span class="details"><a href="/product/{{ item['id'] }}/">See details&hellip;</a></span><br/>
+        <br/><br/>
+        <button class="btn btn-success btn-sm" href="/basket-add/{{ item['id'] }}/" onclick="addToBasket({{ item['id'] }})">Add to basket</button>
+      </div>
+        {% else %}
+          <div class="col-md-4">&nbsp;</div>
+        {% end %}
+    {% end %}
+    </div>
   {% end %}
+
+<div class="row">
+  <nav>
+    <div class="col-md-6">
+      <ul class="pager pagination-lg">
+        <li {% if page == 0 %}class="disabled"{% end %}>
+          <a href="/category/{{ name }}/{{ page - 1 if page > 1 else 0}}/" aria-label="Previous">
+            <span aria-hidden="true">Previous page</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <ul class="pager pagination-lg">
+        <li {% if page == int(total / items_per_page)%}class="disabled"{% end %}>
+          <a href="/category/{{ name }}/{{ page + 1 }}/" aria-label="Next">
+            <span aria-hidden="true">Next page</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</div>
+
+<div class="row">
+  <div class="col-md-12 text-center">
+    <nav>
+      <ul class="pagination pagination-sm">
+        {% for p in range(int(total / items_per_page) + 1) %}
+        <li {% if page == p %}class="active"{% end %}><a href="/category/{{ name }}/{{ p }}/">{{ p + 1 }}</a></li>
+        {% end %}
+      </ul>
+    </nav>
+  </div>
+</div>
+
 {% end %}

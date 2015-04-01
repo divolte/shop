@@ -38,6 +38,10 @@
       "type": "integer",
       "index": "no"
     },
+    "price": {
+      "type": "integer",
+      "index": "no"
+    },
     "owner": {
       "type": "object",
       "enabled": true,

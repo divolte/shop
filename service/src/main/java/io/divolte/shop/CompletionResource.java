@@ -41,16 +41,16 @@ public class CompletionResource {
     @GET
     public void complete(@QueryParam("q") final String q, @Suspended final AsyncResponse response) {
         completionRequest(esClient, q).execute(actionListener(
-                        (suggestionResponse) -> response.resume(new CompletionResponse(suggestionResponse)),
-                        (exception) -> response.resume(exception)
-                        ));
+                (suggestionResponse) -> response.resume(new CompletionResponse(suggestionResponse)),
+                (exception) -> response.resume(exception)
+                ));
     }
 
     public static SuggestRequestBuilder completionRequest(final Client esClient, final String q) {
         return esClient.prepareSuggest("suggestion").addSuggestion(
                 new CompletionSuggestionBuilder("suggest")
-                    .text(q)
-                    .field("suggest")
+                        .text(q)
+                        .field("suggest")
                 );
     }
 
@@ -64,8 +64,8 @@ public class CompletionResource {
         @SuppressWarnings("unchecked")
         public CompletionResponse(SuggestResponse response) {
             /*
-             * We request only one suggestion, so it's safe to take all responses
-             * and flatMap out the options of the entries into a list.
+             * We request only one suggestion, so it's safe to take all
+             * responses and flatMap out the options of the entries into a list.
              */
             this.searches = StreamSupport
                     .stream(response.getSuggest().spliterator(), false)
@@ -78,15 +78,17 @@ public class CompletionResource {
                     .stream(response.getSuggest().spliterator(), false)
                     .map((s) -> (CompletionSuggestion) s)
                     .flatMap((suggestions) -> suggestions.getEntries().stream())
-                    // we need to explicitly state the type here, because the signature uses a supertype that doesn't have a getPayloadAsMap()
-                    .<Option>flatMap((entries) -> entries.getOptions().stream())
+                    // we need to explicitly state the type here, because the
+                    // signature uses a supertype that doesn't have a
+                    // getPayloadAsMap()
+                    .<Option> flatMap((entries) -> entries.getOptions().stream())
                     .findFirst()
                     // Casting required; it's Map's all the way down
                     .map((o) ->
-                        ((List<Map<String,String>>) o.getPayloadAsMap().get("top_hits"))
-                        .stream()
-                        .map((hit) -> new CompletionOption(hit.get("name"), hit.get("link")))
-                        .collect(Collectors.toList())
+                            ((List<Map<String, String>>) o.getPayloadAsMap().get("top_hits"))
+                                    .stream()
+                                    .map((hit) -> new CompletionOption(hit.get("name"), hit.get("link")))
+                                    .collect(Collectors.toList())
                     )
                     .orElseGet(Collections::emptyList);
         }
@@ -122,4 +124,3 @@ public class CompletionResource {
         };
     }
 }
-

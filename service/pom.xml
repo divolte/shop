@@ -40,6 +40,11 @@
       <artifactId>json-path</artifactId>
       <version>1.2.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.cage</groupId>
+      <artifactId>cage</artifactId>
+      <version>1.0</version>
+    </dependency>
 <!--     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-assets</artifactId>

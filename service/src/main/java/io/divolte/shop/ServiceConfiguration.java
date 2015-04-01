@@ -29,10 +29,10 @@ public class ServiceConfiguration extends Configuration {
         this.esPort = esPort == 0 ? DEFAULT_PORT : esPort;
         this.esClusterName = esClusterName == null ? DEFAULT_CLUSTER_NAME : esClusterName;
     }
-    
+
     public ServiceConfiguration() {
-    	this.esHosts = DEFAULT_HOSTS;
-    	this.esPort = DEFAULT_PORT;
-    	this.esClusterName = DEFAULT_CLUSTER_NAME;
+        this.esHosts = DEFAULT_HOSTS;
+        this.esPort = DEFAULT_PORT;
+        this.esClusterName = DEFAULT_CLUSTER_NAME;
     }
 }

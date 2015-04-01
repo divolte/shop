@@ -1,7 +1,7 @@
 package io.divolte.shop;
 
 import static org.elasticsearch.common.unit.TimeValue.timeValueMillis;
-import io.divolte.shop.catalog.CatalogEsConstants;
+import io.divolte.shop.catalog.DataAccess;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,16 +23,16 @@ public class ElasticSearchHealthCheck extends HealthCheck {
     @Override
     protected Result check() throws Exception {
         try {
-        	IndicesStatsResponse response = esClient
-        			.admin()
-        			.indices()
-        			.prepareStats(CatalogEsConstants.CATALOG_INDEX)
-        			.execute()
-        			.get(MAX_ES_RESPONSE_TIME.millis(), TimeUnit.MILLISECONDS);
-        	if (response.getTotal().docs.getCount() == 0) {
-        		return Result.unhealthy("Zero items found in catalog");
-        	}
-        } catch(ElasticsearchException ee) {
+            IndicesStatsResponse response = esClient
+                    .admin()
+                    .indices()
+                    .prepareStats(DataAccess.CATALOG_INDEX)
+                    .execute()
+                    .get(MAX_ES_RESPONSE_TIME.millis(), TimeUnit.MILLISECONDS);
+            if (response.getTotal().docs.getCount() == 0) {
+                return Result.unhealthy("Zero items found in catalog");
+            }
+        } catch (ElasticsearchException ee) {
             // Also occurs in case of timeout
             return Result.unhealthy(ee.getMessage());
         }
