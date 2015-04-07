@@ -41,7 +41,7 @@
       </div>
       <div id="categories-navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-      {% for category in categories %}
+      {% for category in config.CATEGORIES %}
           <li><a href="/category/{{ category }}/">{{ category.title() }}</a></li>
       {% end %}
         </ul>

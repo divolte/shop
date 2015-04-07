@@ -1,5 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-  Home page body content
+<div class="row">
+  <div class="col-md-6">
+    <h4>Welcome to the Shop for Humans!</h4>
+    <p>
+      <ul>
+        <li>Browse and acquire beautiful pictures.</li>
+        <li>Get direct links to the source and the Flickr page.</li>
+        <li>"Pay" by proving that you are human and not a bot.</li>
+        <li>Enjoy!</li>
+      </ul>
+    </p>
+  </div>
+  <div class="col-md-6">
+    {% if top_item %}
+    <h4>Top pick:</h4>
+    <p>
+      <a href="/product/{{ top_item['id'] }}/#/?source=top_pick">
+        <img class="img-responsive img-rounded" src="{{ top_item['variants']['Medium']['img_source'] }}">
+        <script>divolte.signal('impression', { source: 'top_pick', productId: '{{ top_item['id'] }}'})</script>
+      </a>
+    </p>
+    <p>
+      Photo by {{ top_item['owner']['real_name'] or top_item['owner']['user_name']}}
+    </p>
+    {% end %}
+  </div>
+</div>
 {% end %}

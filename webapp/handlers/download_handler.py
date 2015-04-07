@@ -8,5 +8,4 @@ class DownloadHandler(ShopHandler):
         checkout = yield self._get_json('checkout/completed/%s' % id)
         self.render(
             'download.html',
-            categories=self.config.CATEGORIES,
             items=checkout['basket']['items'])

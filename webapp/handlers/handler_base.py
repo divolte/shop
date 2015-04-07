@@ -22,6 +22,19 @@ class ShopHandler(web.RequestHandler):
 
     __initialize = initialize
 
+    # Templating helpers
+    def __grouper(self, iterable, n, fillvalue=None):
+        args = [iter(iterable)] * n
+        return zip_longest(*args, fillvalue=fillvalue)
+
+    def get_template_namespace(self):
+        return {
+            'grouper': self.__grouper,
+            'config': self.config,
+            'shopper': self.shopper
+        }
+
+    # HTTP Helpers
     @coroutine
     def _get_json(self, path, **kwargs):
         http = AsyncHTTPClient()
@@ -55,7 +68,6 @@ class ShopHandler(web.RequestHandler):
             )
         response = yield http.fetch(request)
         return json_decode(response.body)
-
 
     @coroutine
     def _delete_json(self, path):

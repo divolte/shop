@@ -76,3 +76,6 @@ target/
 
 # Local/non-default configuration
 application.conf
+
+divolte-collector-*
+

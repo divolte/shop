@@ -21,6 +21,5 @@ class BasketHandler(ShopHandler):
         basket = yield self._get_json('basket/%s' % self.shopper)
         self.render(
             'basket.html',
-            categories=self.config.CATEGORIES,
             basket=basket,
             ref=self.request.headers.get('Referer', "/"))

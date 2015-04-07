@@ -17,6 +17,7 @@
   function addToBasket(id) {
     $.post('/basket/', { action: 'add', item_id: id }, function() {
       $('#basket-modal').modal('show')
+      divolte.signal('addToBasket', { item_id: id })
     }).fail(function() {
       alert('BROKEN!')
     })

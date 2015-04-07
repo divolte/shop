@@ -10,12 +10,10 @@ class CheckoutHandler(ShopHandler):
         if checkout['step'] == 0:
             self.render(
                 'checkout-1.html',
-                categories=self.config.CATEGORIES,
                 checkout=checkout)
         elif checkout['step'] == 1:
             self.render(
                 'checkout-2.html',
-                categories=self.config.CATEGORIES,
                 checkout=checkout)
         elif checkout['step'] == 2:
             yield self._delete_json('checkout/inflight/%s' % self.shopper)

@@ -3,6 +3,7 @@
 {% block content %}
 <script>
 function trashItem(id) {
+    divolte.signal('removeFromBasket', { item_id: id })
     $.post('/basket/', { action: 'delete', item_id: id }, function() {
       location.reload()
     }).fail(function() {

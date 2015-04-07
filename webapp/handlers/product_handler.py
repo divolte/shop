@@ -9,6 +9,5 @@ class ProductHandler(ShopHandler):
 
         self.render(
             'product.html',
-            categories=self.config.CATEGORIES,
             item=item,
             ref=self.request.headers.get('Referer', "/"))

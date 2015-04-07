@@ -22,7 +22,7 @@
   <div class="row">
     <div class="col-md-3 text-center">
       <h1>
-        <a href="#" data-toggle="modal" data-target="#preview-modal">
+        <a href="#" data-toggle="modal" data-target="#preview-modal" onclick="divolte.signal('preview', { item_id: {{ item['id'] }} });">
           <img src="{{ item['variants']['Small']['img_source'] }}" class="img-responsive img-rounded center-block" onclick="console.log('whatever')">
         </a>
       </h1>
