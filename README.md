@@ -95,6 +95,23 @@ cd ..
 docker-compose up
 ```
 
+The first time you start the docker composition, you have to load the product catalog, like this:
+
+```text
+docker run -it --volume $PWD:/divolte-shop \
+  --workdir /divolte-shop \
+  --network host \
+  python:3.6 \
+  pip install requests && python catalog-builder/put-catagories.py \
+                            data/categories/animals.json \
+                            data/categories/architecture.json \
+                            data/categories/cars.json \
+                            data/categories/cities.json \
+                            data/categories/flowers.json \
+                            data/categories/landscape.json \
+                            data/categories/nautical.json
+```
+
 ## Running without Docker
 
 If you don't want to use Docker Compose, there are a bit more steps to perform: 
