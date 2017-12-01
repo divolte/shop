@@ -89,7 +89,9 @@ services:
       - divolte.io
   # Divolte shop top-pick consumer
   docker-toppick-consumer:
-    image: shop/docker-toppick-consumer
+    build:
+      context: ./top-pick-service
+      dockerfile: Dockerfile.consumer
     container_name: docker-toppick-consumer
     hostname: docker-toppick-consumer
     domainname: divolte_divolte.io
@@ -110,7 +112,9 @@ services:
       - divolte.io
   # Divolte shop top-pick bandit
   docker-toppick-bandit:
-    image: shop/docker-toppick-bandit
+    build:
+      context: ./top-pick-service
+      dockerfile: Dockerfile.bandit
     container_name: docker-toppick-bandit
     hostname: docker-toppick-bandit
     domainname: divolte_divolte.io
