@@ -22,6 +22,7 @@ services:
       - xpack.security.enabled=false
       - network.bind_host=0.0.0.0
       - network.publish_host=divolte-elastic
+      - “ES_JAVA_OPTS=-Xms512m -Xmx512m”
     ports:
       - 9200:9200
       - 9300:9300
@@ -75,6 +76,7 @@ services:
     environment:
       ELASTICSEARCH_HOSTS: "[\"divolte-elastic\"]"
       ELASTICSEARCH_CLUSTER_NAME: elasticsearch
+      JAVA_OPTS: "-Xms512m -Xmx512m"
     ports:
       - 8080:8080
       - 8081:8081
