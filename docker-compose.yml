@@ -50,7 +50,8 @@ services:
       - divolte.io
   # Divolte container
   docker-divolte:
-    image: shop/docker-divolte
+    build:
+      context: ./divolte
     container_name: docker-divolte
     hostname: docker-divolte
     domainname: divolte_divolte.io
@@ -67,7 +68,8 @@ services:
       - divolte.io
   # Divolte shop service
   docker-shop-service:
-    image: shop/docker-shop-service
+    build:
+      context: ./service
     container_name: docker-shop-service
     hostname: docker-shop-service
     domainname: divolte_divolte.io
@@ -126,7 +128,8 @@ services:
       - divolte.io
   # Divolte shop webapp
   docker-shop-webapp:
-    image: shop/docker-shop-webapp
+    build:
+      context: ./webapp
     container_name: docker-shop-webapp
     hostname: docker-shop-webapp
     domainname: divolte_divolte.io
