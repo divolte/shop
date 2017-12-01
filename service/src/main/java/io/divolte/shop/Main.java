@@ -1,6 +1,5 @@
 package io.divolte.shop;
 
-import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
 import io.divolte.shop.catalog.BasketResource;
 import io.divolte.shop.catalog.CatalogCategoryResource;
 import io.divolte.shop.catalog.DataAccess;
@@ -11,6 +10,8 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 
@@ -24,6 +25,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import com.google.common.io.Resources;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 public class Main extends Application<ServiceConfiguration> {
 
@@ -68,10 +70,18 @@ public class Main extends Application<ServiceConfiguration> {
         filter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
     }
 
-    private TransportClient setupElasticSearchClient(final ServiceConfiguration configuration) {
-        final Settings esSettings = settingsBuilder().put("cluster.name", configuration.esClusterName).build();
-        final TransportClient client = new TransportClient(esSettings);
-        configuration.esHosts.forEach((host) -> client.addTransportAddress(new InetSocketTransportAddress(host, configuration.esPort)));
+    private TransportClient setupElasticSearchClient(final ServiceConfiguration configuration) throws UnknownHostException {
+
+        final Settings esSettings = Settings.builder().put("cluster.name", configuration.esClusterName).build();
+        final TransportClient client = new PreBuiltTransportClient(esSettings);
+        configuration.esHosts.forEach((host) -> {
+                    try {
+                        client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), configuration.esPort));
+                    } catch (UnknownHostException e) {
+                        // Do nothing
+                    }
+                }
+        );
         return client;
     }
 

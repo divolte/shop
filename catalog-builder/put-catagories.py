@@ -87,7 +87,7 @@ def main(args):
 def parse_args():
     parser = argparse.ArgumentParser(description='Take downloaded category JSON files and push them into the Catalog API.')
     parser.add_argument('--api-base-url', '-u', metavar='API_BASE_URL', type=str, default='http://localhost:8080/api', help='The base URL of the Catalog API.')
-    parser.add_argument('files', metavar='JOSN_FILE', type=str, nargs='+')
+    parser.add_argument('files', metavar='JSON_FILE', type=str, nargs='+')
 
     return parser.parse_args()
 

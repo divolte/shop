@@ -19,7 +19,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -46,11 +45,11 @@ public class CatalogCategoryResource {
             @DefaultValue("20") @QueryParam("size") final int imagesPerPage,
             @Suspended final AsyncResponse response) {
 
-        client.prepareSearch(DataAccess.CATALOG_INDEX).setQuery(QueryBuilders.constantScoreQuery(FilterBuilders.termFilter("categories", name)));
+        client.prepareSearch(DataAccess.CATALOG_INDEX).setQuery(QueryBuilders.constantScoreQuery(QueryBuilders.termQuery("categories", name)));
         DataAccess.execute(
                 client.prepareSearch(DataAccess.CATALOG_INDEX)
-                        .setQuery(QueryBuilders.constantScoreQuery(FilterBuilders.termFilter("categories", name)))
-                        .addSort(SortBuilders.fieldSort("_id")) // Since we only
+                        .setQuery(QueryBuilders.constantScoreQuery(QueryBuilders.termQuery("categories", name)))
+                        .addSort(SortBuilders.fieldSort("_uid")) // Since we only
                                                                 // support ID at
                                                                 // this point
                         .setSize(imagesPerPage)

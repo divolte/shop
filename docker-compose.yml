@@ -1,0 +1,111 @@
+version: "3.3"
+services:
+  # redis container
+  divolte-redis:
+    image: redis:alpine
+    container_name: divolte-redis
+    hostname: divolte-redis
+    domainname: divolte_divolte.io
+    ports:
+      - 6379:6379 # redis server
+    networks:
+      - divolte.io
+  # elastic container
+  divolte-elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
+    container_name: divolte-elastic
+    hostname: divolte-elastic
+    domainname: divolte_divolte.io
+    environment:
+      - cluster.name=elasticsearch
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - network.bind_host=0.0.0.0
+      - network.publish_host=divolte-elastic
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - divolte.io
+  # Kafka/Zookeeper container
+  divolte-kafka:
+    image: krisgeus/docker-kafka
+    container_name: divolte-kafka
+    hostname: divolte-kafka
+    domainname: divolte_divolte.io
+    environment:
+      ADVERTISED_HOST: divolte-kafka
+      LOG_RETENTION_HOURS: 1
+      AUTO_CREATE_TOPICS: "false"
+      KAFKA_CREATE_TOPICS: divolte:4:1
+      ADVERTISED_LISTENERS: PLAINTEXT://divolte-kafka:9092,INTERNAL://localhost:9093
+      LISTENERS: PLAINTEXT://0.0.0.0:9092,INTERNAL://0.0.0.0:9093
+      SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
+      INTER_BROKER: INTERNAL
+    ports:
+      - 9092:9092 # kafka broker
+      - 2181:2181 # Zookeeper
+    networks:
+      - divolte.io
+  # Divolte container
+  docker-divolte:
+    image: shop/docker-divolte
+    container_name: docker-divolte
+    hostname: docker-divolte
+    domainname: divolte_divolte.io
+    environment:
+      DIVOLTE_KAFKA_BROKER_LIST: divolte-kafka:9092
+      DIVOLTE_CONF_DIR: /etc/shop/divolte
+    ports:
+      - 8290:8290
+    depends_on:
+      - divolte-kafka
+    links:
+      - divolte-kafka:divolte-kafka
+    networks:
+      - divolte.io
+  # Divolte shop service
+  docker-shop-service:
+    image: shop/docker-shop-service
+    container_name: docker-shop-service
+    hostname: docker-shop-service
+    domainname: divolte_divolte.io
+    environment:
+      ELASTICSEARCH_HOSTS: "[\"divolte-elastic\"]"
+      ELASTICSEARCH_CLUSTER_NAME: elasticsearch
+    ports:
+      - 8080:8080
+      - 8081:8081
+    depends_on:
+      - docker-divolte
+      - divolte-elastic
+    links:
+      - docker-divolte:docker-divolte
+      - divolte-elastic:divolte-elastic
+    networks:
+      - divolte.io
+  # Divolte shop webapp
+  docker-shop-webapp:
+    image: shop/docker-shop-webapp
+    container_name: docker-shop-webapp
+    hostname: docker-shop-webapp
+    domainname: divolte_divolte.io
+    environment:
+      SHOP_API_URL: "http://docker-shop-service:8080/api"
+      SHOP_DIVOLTE_URL: "//docker-divolte:8290/divolte.js"
+      SHOP_WEBAPP_SECRET: "foo"
+      SHOP_WEBAPP_PORT: 9011
+    ports:
+      - 9011:9011
+    depends_on:
+      - docker-divolte
+      - docker-shop-service
+    links:
+      - docker-divolte:docker-divolte
+      - docker-shop-service:docker-shop-service
+    networks:
+      - divolte.io
+  
+networks:
+  divolte.io:
+    driver: bridge

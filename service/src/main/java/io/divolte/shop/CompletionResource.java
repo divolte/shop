@@ -18,12 +18,13 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.suggest.SuggestRequestBuilder;
-import org.elasticsearch.action.suggest.SuggestResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestion;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestion.Entry.Option;
-import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -46,12 +47,18 @@ public class CompletionResource {
                 ));
     }
 
-    public static SuggestRequestBuilder completionRequest(final Client esClient, final String q) {
-        return esClient.prepareSuggest("suggestion").addSuggestion(
-                new CompletionSuggestionBuilder("suggest")
-                        .text(q)
-                        .field("suggest")
-                );
+    public static SearchRequestBuilder completionRequest(final Client esClient, final String q) {
+        return esClient.prepareSearch("suggestion").suggest(
+                new SuggestBuilder().addSuggestion("suggestion",
+                        SuggestBuilders.completionSuggestion("suggest")
+                                .text(q)
+                )
+        );
+//        return esClient.prepareSuggest("suggestion").addSuggestion(
+//                new CompletionSuggestionBuilder("suggest")
+//                        .text(q)
+//                        .field("suggest")
+//                );
     }
 
     public static final class CompletionResponse {
@@ -62,7 +69,7 @@ public class CompletionResource {
         public final List<CompletionOption> topHits;
 
         @SuppressWarnings("unchecked")
-        public CompletionResponse(SuggestResponse response) {
+        public CompletionResponse(SearchResponse response) {
             /*
              * We request only one suggestion, so it's safe to take all
              * responses and flatMap out the options of the entries into a list.
@@ -85,7 +92,7 @@ public class CompletionResource {
                     .findFirst()
                     // Casting required; it's Map's all the way down
                     .map((o) ->
-                            ((List<Map<String, String>>) o.getPayloadAsMap().get("top_hits"))
+                            ((List<Map<String, String>>) o.getHit().getSourceAsMap())
                                     .stream()
                                     .map((hit) -> new CompletionOption(hit.get("name"), hit.get("link")))
                                     .collect(Collectors.toList())
@@ -110,15 +117,15 @@ public class CompletionResource {
         }
     }
 
-    public static ActionListener<SuggestResponse> actionListener(final Consumer<SuggestResponse> onSuccess, final Consumer<Throwable> onFailure) {
-        return new ActionListener<SuggestResponse>() {
+    public static ActionListener<SearchResponse> actionListener(final Consumer<SearchResponse> onSuccess, final Consumer<Throwable> onFailure) {
+        return new ActionListener<SearchResponse>() {
             @Override
-            public void onResponse(SuggestResponse response) {
+            public void onResponse(SearchResponse response) {
                 onSuccess.accept(response);
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void onFailure(Exception e) {
                 onFailure.accept(e);
             }
         };

@@ -11,7 +11,7 @@
         <div class="form-group">
           <img class="img-responsive" src="/captcha/{{ i }}/"></img>
           <label for="token{{ i }}">Response</label>
-          <input type="email" class="form-control" id="token{{ i }}" name="token{{ i }}" placeholder="CAPTCHA response">
+          <input type="text" class="form-control" id="token{{ i }}" name="token{{ i }}" placeholder="CAPTCHA response">
         </div>
         {% end %}
         <input type="hidden" name="step" value="2">

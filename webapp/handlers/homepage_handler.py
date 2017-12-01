@@ -8,13 +8,13 @@ from .handler_base import ShopHandler
 class HomepageHandler(ShopHandler):
     @coroutine
     def get(self):
-        http = AsyncHTTPClient()
-        request = HTTPRequest(url='http://localhost:8989/item', method='GET')
         try:
+            http = AsyncHTTPClient()
+            request = HTTPRequest(url='http://localhost:8989/item', method='GET')
             response = yield with_timeout(timedelta(milliseconds=15), http.fetch(request))
             winner = json_decode(response.body)
             top_item = yield self._get_json('catalog/item/%s' % winner)
-        except (ConnectionRefusedError, TimeoutError):
+        except (OSError, ConnectionRefusedError, TimeoutError):
             top_item = None
 
         self.render(

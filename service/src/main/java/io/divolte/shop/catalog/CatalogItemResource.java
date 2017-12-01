@@ -68,7 +68,7 @@ public class CatalogItemResource {
     public void putItem(@Valid final Item item, @Suspended final AsyncResponse response) throws IOException {
         final XContentBuilder builder = itemToContentBuilder(item);
         execute(
-                client.prepareIndex(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE).setSource(builder),
+                client.prepareIndex(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, item.id).setSource(builder),
                 (r, e) -> {
                     if (e.isPresent()) {
                         response.resume(e.get());
@@ -109,7 +109,9 @@ public class CatalogItemResource {
             }
         });
         builder.endArray();
-        return builder;
+        builder.endObject();
+
+$        return builder;
     }
 
     @JsonSnakeCase
