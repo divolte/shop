@@ -77,6 +77,7 @@ cd ..
 
 ```bash
 cd service
+mvn package
 docker build -t shop/docker-shop-service .
 cd ..
 ```
