@@ -10,7 +10,7 @@ class HomepageHandler(ShopHandler):
     def get(self):
         try:
             http = AsyncHTTPClient()
-            request = HTTPRequest(url='http://localhost:8989/item', method='GET')
+            request = HTTPRequest(url=self.config.BANDIT_URL, method='GET')
             response = yield with_timeout(timedelta(milliseconds=15), http.fetch(request))
             winner = json_decode(response.body)
             top_item = yield self._get_json('catalog/item/%s' % winner)

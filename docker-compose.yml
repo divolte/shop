@@ -22,6 +22,7 @@ services:
       - xpack.security.enabled=false
       - network.bind_host=0.0.0.0
       - network.publish_host=divolte-elastic
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - 9200:9200
       - 9300:9300
@@ -84,6 +85,45 @@ services:
       - divolte-elastic:divolte-elastic
     networks:
       - divolte.io
+  # Divolte shop top-pick consumer
+  docker-toppick-consumer:
+    image: shop/docker-toppick-consumer
+    container_name: docker-toppick-consumer
+    hostname: docker-toppick-consumer
+    domainname: divolte_divolte.io
+    environment:
+      REDIS_HOST_PORT: "divolte-redis:6379"
+      KAFKA_BROKERS: "divolte-kafka:9092"
+      KAFKA_TOPIC: divolte
+      ELASTIC_HOST_PORT: "divolte-elastic:9200"
+    depends_on:
+      - divolte-redis
+      - divolte-kafka
+      - divolte-elastic
+    links:
+      - divolte-redis:divolte-redis
+      - divolte-kafka:divolte-kafka
+      - divolte-elastic:divolte-elastic
+    networks:
+      - divolte.io
+  # Divolte shop top-pick bandit
+  docker-toppick-bandit:
+    image: shop/docker-toppick-bandit
+    container_name: docker-toppick-bandit
+    hostname: docker-toppick-bandit
+    domainname: divolte_divolte.io
+    environment:
+      REDIS_HOST_PORT: "divolte-redis:6379"
+      BIND_PORT: 8989
+      BIND_HOST: 0.0.0.0
+    ports:
+      - 8989:8989
+    depends_on:
+      - divolte-redis
+    links:
+      - divolte-redis:divolte-redis
+    networks:
+      - divolte.io
   # Divolte shop webapp
   docker-shop-webapp:
     image: shop/docker-shop-webapp
@@ -92,6 +132,7 @@ services:
     domainname: divolte_divolte.io
     environment:
       SHOP_API_URL: "http://docker-shop-service:8080/api"
+      SHOP_BANDIT_URL: "http://docker-toppick-bandit:8989/item"
       SHOP_DIVOLTE_URL: "//localhost:8290/divolte.js"
       SHOP_WEBAPP_SECRET: "foo"
       SHOP_WEBAPP_PORT: 9011
@@ -99,9 +140,11 @@ services:
       - 9011:9011
     depends_on:
       - docker-divolte
+      - docker-toppick-bandit
       - docker-shop-service
     links:
       - docker-divolte:docker-divolte
+      - docker-toppick-bandit:docker-toppick-bandit
       - docker-shop-service:docker-shop-service
     networks:
       - divolte.io
