@@ -111,7 +111,7 @@ public class CatalogItemResource {
         builder.endArray();
         builder.endObject();
 
-$        return builder;
+        return builder;
     }
 
     @JsonSnakeCase
