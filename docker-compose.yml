@@ -76,6 +76,7 @@ services:
     environment:
       ELASTICSEARCH_HOSTS: "[\"divolte-elastic\"]"
       ELASTICSEARCH_CLUSTER_NAME: elasticsearch
+      JAVA_OPTS: "-Xms512m -Xmx512m"
     ports:
       - 8080:8080
       - 8081:8081

@@ -26,4 +26,4 @@ while ! is_ready; do
     sleep 5
 done
 
-java -jar /opt/shop/shop-service.jar server /opt/shop/config.json
+java $JAVA_OPTS -jar /opt/shop/shop-service.jar server /opt/shop/config.json
