@@ -65,35 +65,10 @@ We will use these public containers:
 
 [ds]:https://store.docker.com/
 
-### build the divolte container
-
-```bash
-cd divolte
-docker build -t shop/docker-divolte .
-cd ..
-```
-
-### build the service container
-
-```bash
-cd service
-mvn package
-docker build -t shop/docker-shop-service .
-cd ..
-```
-
-### build the webapp container
-
-```bash
-cd webapp
-docker build -t shop/docker-shop-webapp .
-cd ..
-```
-
 ### Running with docker compose
 
 ```bash
-docker-compose up
+mvn -f service/pom.xml package && docker-compose up
 ```
 
 The first time you start the docker composition, you have to load the product catalog, like this:
