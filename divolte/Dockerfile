@@ -14,3 +14,5 @@ ADD schema/src/main/docker/divolte-collector.conf /etc/shop/divolte/divolte-coll
 ADD schema/src/main/groovy/mapping.groovy /etc/shop/divolte/mapping.groovy
 ADD schema/src/main/resources/ShopEventRecord.avsc /etc/shop/divolte/ShopEventRecord.avsc
 RUN chown root:root /etc/shop/divolte/*
+
+EXPOSE 8290

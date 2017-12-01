@@ -92,7 +92,7 @@ services:
     domainname: divolte_divolte.io
     environment:
       SHOP_API_URL: "http://docker-shop-service:8080/api"
-      SHOP_DIVOLTE_URL: "//docker-divolte:8290/divolte.js"
+      SHOP_DIVOLTE_URL: "//localhost:8290/divolte.js"
       SHOP_WEBAPP_SECRET: "foo"
       SHOP_WEBAPP_PORT: 9011
     ports:
