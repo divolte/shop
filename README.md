@@ -48,10 +48,10 @@ The easier way to get started with with Docker Compose.
 
 Make sure you have Docker running locally. You can download a proper version at the [Docker Store][ds].
 
-We are running 6 containers, so the default size is not large enough. Boost the ram of Docker to at least 4GB, otherwise
-you will run into startup problems (Exit with code: 137) when running the `docker compose up` command.
+We are running 6 containers, and the default size is not large enough. Boost the ram of Docker to at least 4GB,
+otherwise you will run into startup problems (Exit with code: 137) when running the `docker-compose up` command.
 
-We are going to build these containers locally, we prefix them with _shop/_:
+We are going to build these containers locally:
 
 - shop/docker-divolte
 - shop/docker-shop-service
@@ -78,14 +78,14 @@ docker run -it --volume $PWD:/divolte-shop \
   --workdir /divolte-shop \
   --network host \
   python:3.6 \
-  pip install requests && python catalog-builder/put-catagories.py \
+  bash -c 'pip install requests && python catalog-builder/put-catagories.py \
                             data/categories/animals.json \
                             data/categories/architecture.json \
                             data/categories/cars.json \
                             data/categories/cities.json \
                             data/categories/flowers.json \
                             data/categories/landscape.json \
-                            data/categories/nautical.json
+                            data/categories/nautical.json'
 ```
 
 ## Running without Docker
