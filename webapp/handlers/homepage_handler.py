@@ -1,9 +1,7 @@
 from tornado.gen import coroutine, with_timeout, TimeoutError
-from tornado.httpclient import HTTPRequest,AsyncHTTPClient
+from tornado.httpclient import HTTPRequest,AsyncHTTPClient, HTTPError
 from tornado.escape import json_decode
 from datetime import timedelta
-
-from tornado.web import HTTPError
 
 from .handler_base import ShopHandler
 
