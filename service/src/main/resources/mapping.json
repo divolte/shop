@@ -2,19 +2,10 @@
   "_all": {
     "enabled": false
   },
-  "_type": {
-    "index": "no"
-  },
-  "_timestamp": {
-    "enabled": false
-  },
   "_source": {
     "enabled": true
   },
   "dynamic": false,
-  "_id": {
-    "path": "id"
-  },
   "properties": {
     "title": {
       "type": "string",

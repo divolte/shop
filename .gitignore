@@ -7,6 +7,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+venv/
 env/
 build/
 develop-eggs/
@@ -78,4 +79,4 @@ target/
 application.conf
 
 divolte-collector-*
-
+flask_secret

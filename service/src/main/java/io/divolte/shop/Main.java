@@ -1,6 +1,5 @@
 package io.divolte.shop;
 
-import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
 import io.divolte.shop.catalog.BasketResource;
 import io.divolte.shop.catalog.CatalogCategoryResource;
 import io.divolte.shop.catalog.DataAccess;
@@ -11,6 +10,8 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 
@@ -24,6 +25,8 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import com.google.common.io.Resources;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 public class Main extends Application<ServiceConfiguration> {
 
@@ -50,17 +53,22 @@ public class Main extends Application<ServiceConfiguration> {
         if (!client.admin().indices().prepareExists(DataAccess.CATALOG_INDEX).get().isExists()) {
             client.admin().indices()
                     .prepareCreate(DataAccess.CATALOG_INDEX)
-                    .setSettings(Resources.toString(Resources.getResource("settings.json"), StandardCharsets.UTF_8))
+                    .setSettings(Settings.builder()
+                            .loadFromSource(
+                                    Resources.toString(Resources.getResource("settings.json"), StandardCharsets.UTF_8),
+                                    XContentType.JSON)
+                            .build()
+                    )
                     .addMapping(DataAccess.ITEM_DOCUMENT_TYPE,
-                            Resources.toString(Resources.getResource("mapping.json"), StandardCharsets.UTF_8))
+                            Resources.toString(Resources.getResource("mapping.json"), StandardCharsets.UTF_8),
+                            XContentType.JSON)
                     .get();
         }
     }
 
     private void enableCrossOriginResourceSharing(final Environment environment) {
         Dynamic filter = environment.servlets().addFilter("CORS", CrossOriginFilter.class);
-        filter.setInitParameter("allowedOrigins", "*"); // allowed origins comma
-                                                        // separated
+        filter.setInitParameter("allowedOrigins", "*"); // allowed origins comma separated
         filter.setInitParameter("allowedHeaders", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin");
         filter.setInitParameter("allowedMethods", "GET,PUT,POST,DELETE,OPTIONS,HEAD");
         filter.setInitParameter("preflightMaxAge", "5184000"); // 2 months
@@ -68,10 +76,18 @@ public class Main extends Application<ServiceConfiguration> {
         filter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
     }
 
-    private TransportClient setupElasticSearchClient(final ServiceConfiguration configuration) {
-        final Settings esSettings = settingsBuilder().put("cluster.name", configuration.esClusterName).build();
-        final TransportClient client = new TransportClient(esSettings);
-        configuration.esHosts.forEach((host) -> client.addTransportAddress(new InetSocketTransportAddress(host, configuration.esPort)));
+    private TransportClient setupElasticSearchClient(final ServiceConfiguration configuration) throws UnknownHostException {
+
+        final Settings esSettings = Settings.builder().put("cluster.name", configuration.esClusterName).build();
+        final TransportClient client = new PreBuiltTransportClient(esSettings);
+        configuration.esHosts.forEach((host) -> {
+                    try {
+                        client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), configuration.esPort));
+                    } catch (UnknownHostException e) {
+                        // Do nothing
+                    }
+                }
+        );
         return client;
     }
 

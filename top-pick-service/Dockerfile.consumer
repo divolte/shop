@@ -1,0 +1,17 @@
+FROM python:3
+
+ENV REDIS_HOST_PORT ${REDIS_HOST_PORT:-localhost:6379}
+ENV KAFKA_BROKERS ${KAFKA_BROKERS:-localhost:9092}
+ENV KAFKA_TOPIC ${KAFKA_TOPIC:-divolte}
+ENV ELASTIC_HOST_PORT ${ELASTIC_HOST_PORT:-localhost:9200}
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY start-consumer.sh ./
+COPY consumer.py ./
+COPY ShopEventRecord.avsc ./
+
+CMD [ "/usr/src/app/start-consumer.sh" ]

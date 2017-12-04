@@ -33,7 +33,7 @@ def start_consumer(args):
     # Create a Kafka consumer and Avro reader. Note that
     # it is trivially possible to create a multi process
     # consumer.
-    consumer = KafkaConsumer(args.topic, client_id=args.client, group_id=args.group, metadata_broker_list=args.brokers)
+    consumer = KafkaConsumer(args.topic, client_id=args.client, group_id=args.group, bootstrap_servers=args.brokers)
     reader = avro.io.DatumReader(schema)
 
     # Consume messages.
@@ -81,12 +81,18 @@ def refresh_items():
         ascii_bytes(item)
         for item in random_item_set(NUM_ITEMS + NUM_ITEMS - len(current_items) // 2)
         if not item in current_items][:NUM_ITEMS - len(current_items) // 2]
+    
+    def _get_item(key):
+        try:
+            return int(current_item_dict[key])
+        except (KeyError):
+            return int(1)
 
     # Draw random samples.
     samples = [
         numpy.random.beta(
-            int(current_item_dict[CLICK_KEY_PREFIX + item]),
-            int(current_item_dict[IMPRESSION_KEY_PREFIX + item]))
+            _get_item(CLICK_KEY_PREFIX + item),
+            _get_item(IMPRESSION_KEY_PREFIX + item))
         for item in current_items]
 
     # Select top half by sample values. current_items is conveniently
@@ -129,7 +135,7 @@ def parse_args():
     parser.add_argument('--client', '-c', metavar='CLIENT_ID', type=utf8_bytes, required=True, help='Kafka client id.')
     parser.add_argument('--group', '-g', metavar='GROUP_ID', type=utf8_bytes, required=True, help='Kafka consumer group id.')
     parser.add_argument('--brokers', '-b', metavar='KAFKA_BROKERS', type=str, nargs="+", help='A list of Kafka brokers (host:port).', default=['localhost:9092'])
-    parser.add_argument('--topic', '-t', metavar='TOPIC', type=utf8_bytes, required=False, default='divolte', help='Kafka topic.')
+    parser.add_argument('--topic', '-t', metavar='TOPIC', type=str, required=False, default='divolte', help='Kafka topic.')
     parser.add_argument('--elasticsearch', '-e', metavar='ELASTIC_SEARCH_HOST_PORT', type=str, required=False, default='localhost:9200', help='The ElasticSearch instance to connect to (host:port).')
     return parser.parse_args()
 

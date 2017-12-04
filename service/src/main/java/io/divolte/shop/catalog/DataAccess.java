@@ -28,7 +28,7 @@ public final class DataAccess {
     public final static String CATALOG_INDEX = "catalog";
     public final static String ITEM_DOCUMENT_TYPE = "item";
 
-    public static <ESR extends ActionResponse> void execute(ActionRequestBuilder<?, ESR, ?, ?> builder, BiConsumer<Optional<ESR>, Optional<Throwable>> handler) {
+    public static <ESR extends ActionResponse> void execute(ActionRequestBuilder<?, ESR, ?> builder, BiConsumer<Optional<ESR>, Optional<Throwable>> handler) {
         builder.execute(new ActionListener<ESR>() {
             @Override
             public void onResponse(ESR response) {
@@ -36,7 +36,7 @@ public final class DataAccess {
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void onFailure(Exception e) {
                 handler.accept(Optional.empty(), Optional.of(e));
             }
         });

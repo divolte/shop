@@ -1,0 +1,17 @@
+FROM python:3
+
+ENV REDIS_HOST_PORT ${REDIS_HOST_PORT:-localhost:6379}
+ENV BIND_HOST ${BIND_HOST:-0.0.0.0}
+ENV BIND_PORT ${BIND_PORT:-8989}
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY start-bandit.sh ./
+COPY bandit_service.py ./
+
+EXPOSE 8989
+
+CMD [ "/usr/src/app/start-bandit.sh" ]
