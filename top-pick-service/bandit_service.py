@@ -19,9 +19,7 @@ class BanditHandler(web.RequestHandler):
     def get(self):
         # Fetch model state.
         item_dict = yield gen.Task(self.redis_client.hgetall, ITEM_HASH_KEY)
-        print(item_dict)
         items = numpy.unique([k[2:] for k in item_dict.keys()])
-        print(items)
         # Draw random samples.
         samples = [
             numpy.random.beta(int(item_dict[CLICK_KEY_PREFIX + item]), int(item_dict[IMPRESSION_KEY_PREFIX + item]))
@@ -30,7 +28,6 @@ class BanditHandler(web.RequestHandler):
         # Select item with largest sample value.
         if samples:
             winner = items[numpy.argmax(samples)]
-            print(winner)
             self.write(winner)
         else:
             raise web.HTTPError(404)
