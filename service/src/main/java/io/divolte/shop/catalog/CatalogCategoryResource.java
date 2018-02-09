@@ -53,7 +53,7 @@ public class CatalogCategoryResource {
         SearchRequest searchRequest = new SearchRequest(DataAccess.CATALOG_INDEX);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(QueryBuilders.constantScoreQuery(QueryBuilders.termQuery("categories", name)))
-                .sort(SortBuilders.fieldSort("_uid"))
+                .sort(SortBuilders.fieldSort("_id"))
                 .size(imagesPerPage)
                 .from(page * imagesPerPage);
         searchRequest.source(searchSourceBuilder);

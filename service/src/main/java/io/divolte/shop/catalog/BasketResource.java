@@ -1,7 +1,6 @@
 package io.divolte.shop.catalog;
 
 import static io.divolte.shop.catalog.DataAccess.BASKETS;
-import static io.divolte.shop.catalog.DataAccess.execute;
 import io.divolte.shop.catalog.CatalogItemResource.Item;
 import io.dropwizard.jackson.JsonSnakeCase;
 
