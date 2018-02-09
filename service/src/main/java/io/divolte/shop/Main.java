@@ -62,7 +62,8 @@ public class Main extends Application<ServiceConfiguration> {
             );
             createRequest.mapping(
                     DataAccess.ITEM_DOCUMENT_TYPE,
-                    Resources.toString(Resources.getResource("mapping.json"), StandardCharsets.UTF_8)
+                    Resources.toString(Resources.getResource("mapping.json"), StandardCharsets.UTF_8),
+                    XContentType.JSON
             );
 
             client.indices().create(createRequest);

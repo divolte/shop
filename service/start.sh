@@ -2,7 +2,7 @@
 
 echo -n "{                                
   \"elasticsearch_hosts\" : ${ELASTICSEARCH_HOSTS},
-  \"elasticsearch_port\": 9300,
+  \"elasticsearch_port\": 9200,
   \"elasticsearch_cluster_name\": \"${ELASTICSEARCH_CLUSTER_NAME}\"
 }" > /opt/shop/config.json
 
