@@ -28,6 +28,24 @@ services:
       - 9300:9300
     networks:
       - divolte.io
+  # elastic container
+  divolte-kibana:
+    image: docker.elastic.co/kibana/kibana:6.2.1
+    container_name: divolte-kibana
+    hostname: divolte-kibana
+    domainname: divolte_divolte.io
+    environment:
+      SERVER_NAME: kibana.divolte_divolte.io
+      ELASTICSEARCH_URL: http://divolte-elastic:9200
+      LOGGING_QUIET: "true"
+    ports:
+      - 5601:5601
+    depends_on:
+      - divolte-elastic
+    links:
+      - divolte-elastic:divolte-elastic
+    networks:
+      - divolte.io
   # Kafka/Zookeeper container
   divolte-kafka:
     image: krisgeus/docker-kafka
