@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
-@Path("/api/catalog/category")
+@Path("/api/catalog")
 public class CatalogCategoryResource {
     private final RestHighLevelClient client;
 
@@ -39,7 +39,7 @@ public class CatalogCategoryResource {
         this.client = client;
     }
 
-    @Path("{name}")
+    @Path("category/{name}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public void getCategory(
@@ -58,6 +58,37 @@ public class CatalogCategoryResource {
                 .from(page * imagesPerPage);
         searchRequest.source(searchSourceBuilder);
 
+        searchAsync(name, page, response, searchRequest);
+    }
+
+    @Path("search")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public void search(
+            @QueryParam("query") final String query,
+            @DefaultValue("ID") @QueryParam("order") final String order,
+            @DefaultValue("0") @QueryParam("page") final int page,
+            @DefaultValue("20") @QueryParam("size") final int imagesPerPage,
+            @Suspended final AsyncResponse response) {
+        String[] terms = query.split("\\b");
+
+        SearchRequest searchRequest = new SearchRequest(DataAccess.CATALOG_INDEX);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(
+                QueryBuilders.constantScoreQuery(
+                    QueryBuilders.boolQuery()
+                            .should(QueryBuilders.termsQuery("description", terms))
+                            .should(QueryBuilders.termsQuery("tags", terms))
+                            .minimumShouldMatch(1)))
+                .sort(SortBuilders.fieldSort("_id"))
+                .size(imagesPerPage)
+                .from(page * imagesPerPage);
+        searchRequest.source(searchSourceBuilder);
+
+        searchAsync("results", page, response, searchRequest);
+    }
+
+    private void searchAsync(@PathParam("name") String name, @DefaultValue("0") @QueryParam("page") int page, @Suspended AsyncResponse response, SearchRequest searchRequest) {
         client.searchAsync(searchRequest, new ActionListener<SearchResponse>() {
             @Override
             public void onResponse(SearchResponse searchResponse) {
@@ -79,10 +110,6 @@ public class CatalogCategoryResource {
                 response.resume(e);
             }
         });
-    }
-
-    public static enum ORDER {
-        ID;
     }
 
     public static final class Category {

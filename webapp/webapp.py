@@ -13,7 +13,8 @@ routes = [
     web.URLSpec(r'/basket/', BasketHandler, { 'config': config }),
     web.URLSpec(r'/checkout/', CheckoutHandler, { 'config': config }),
     web.URLSpec(r'/captcha/([0-9]{1,3})/', ImageHandler, { 'config': config }),
-    web.URLSpec(r'/download/([a-f0-9]{32,60})/', DownloadHandler, { 'config': config })
+    web.URLSpec(r'/download/([a-f0-9]{32,60})/', DownloadHandler, { 'config': config }),
+    web.URLSpec(r'/search', SearchHandler, { 'config': config })
 ]
 
 def main(args):

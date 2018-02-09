@@ -6,32 +6,38 @@ from tornado.httpclient import HTTPError
 from .handler_base import ShopHandler
 
 
-class CategoryHandler(ShopHandler):
+class SearchHandler(ShopHandler):
+
     @coroutine
-    def get(self, name, page):
+    def get(self):
+        log = logging.getLogger('SearchHandler')
         try:
+            q = self.get_argument('q')
+            page = self.get_argument('page', None)
+            log.debug(f'Search, q={q}; page={page}')
             categories = yield self._get_json(
-                'catalog/category/%s' % name,
+                'catalog/search',
+                query=q,
                 page=int(page) if page else 0,
                 size=self.config.ITEMS_PER_PAGE)
-
-            name = categories['name']
             page = categories['page']
             items_per_page = self.config.ITEMS_PER_PAGE
             total = categories['total']
+            query = q
             self.render(
                 'category.html',
                 items=categories['items'],
                 page=page,
-                items_per_page=items_per_page,
+                items_per_page=self.config.ITEMS_PER_PAGE,
                 total=total,
+                query=query,
                 prev_enabled=(page > 0),
-                prev_url=f'/category/{ name }/{ page - 1 if page > 1 else 0}/',
+                prev_url=f'/search?q={ query }&page={ page - 1 if page > 1 else 0}',
                 next_enabled=(page < int(total / items_per_page)),
-                next_url=f'/category/{ name }/{ page + 1 }/',
-                page_url=f'/category/{ name }/%p/')
+                next_url=f'/search?q={ query }&page={ page + 1 }',
+                page_url=f'/search?q={ query }&page=%p')
         except HTTPError as e:
-            logging.error("Catalogue not found")
+            log.error("Catalogue not found")
             if e.code == 404:
                 self.render('catalog-not-initialised.html')
             else:
