@@ -1,14 +1,16 @@
 package io.divolte.shop.catalog;
 
-import static io.divolte.shop.catalog.DataAccess.execute;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jackson.JsonSnakeCase;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -19,17 +21,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/api/catalog/item")
@@ -294,9 +288,9 @@ public class CatalogItemResource {
 
         @JsonSnakeCase
         public static final class Variant {
-            @NotEmpty
+            @Min(1)
             public final int width;
-            @NotEmpty
+            @Min(1)
             public final int height;
             @NotEmpty
             public final String flickrUrl;
