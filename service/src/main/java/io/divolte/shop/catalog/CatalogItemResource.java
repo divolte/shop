@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jackson.JsonSnakeCase;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
@@ -149,13 +150,21 @@ public class CatalogItemResource {
                 @JsonProperty("variants") final Map<String, Variant> variants) {
             this.id = id;
             this.price = price;
-            this.categories = ImmutableList.copyOf(categories);
+            this.categories = ImmutableList.copyOf(nel(categories));
             this.title = title;
             this.description = description;
-            this.tags = ImmutableList.copyOf(tags);
+            this.tags = ImmutableList.copyOf(nel(tags));
             this.favs = favs;
             this.owner = owner;
-            this.variants = ImmutableMap.copyOf(variants);
+            this.variants = ImmutableMap.copyOf(nem(variants));
+        }
+
+        private static <T> List<T> nel(List<T> list) {
+            return list != null ? list : Collections.emptyList();
+        }
+
+        private static <K,V> Map<K,V> nem(Map<K,V> map) {
+            return map != null ? map : Collections.emptyMap();
         }
 
         @Override
