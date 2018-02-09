@@ -18,9 +18,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -29,9 +33,9 @@ import com.google.common.collect.ImmutableList;
 
 @Path("/api/catalog/category")
 public class CatalogCategoryResource {
-    private final TransportClient client;
+    private final RestHighLevelClient client;
 
-    public CatalogCategoryResource(TransportClient client) {
+    public CatalogCategoryResource(RestHighLevelClient client) {
         this.client = client;
     }
 
@@ -45,31 +49,55 @@ public class CatalogCategoryResource {
             @DefaultValue("20") @QueryParam("size") final int imagesPerPage,
             @Suspended final AsyncResponse response) {
 
-        client.prepareSearch(DataAccess.CATALOG_INDEX).setQuery(QueryBuilders.constantScoreQuery(QueryBuilders.termQuery("categories", name)));
-        DataAccess.execute(
-                client.prepareSearch(DataAccess.CATALOG_INDEX)
-                        .setQuery(QueryBuilders.constantScoreQuery(QueryBuilders.termQuery("categories", name)))
-                        .addSort(SortBuilders.fieldSort("_uid")) // Since we only
-                                                                // support ID at
-                                                                // this point
-                        .setSize(imagesPerPage)
-                        .setFrom(page * imagesPerPage),
-                (r, e) -> {
-                    if (e.isPresent()) {
-                        response.resume(e.get());
-                    } else {
-                        if (r.get().getHits().hits().length == 0) {
+        SearchRequest searchRequest = new SearchRequest(DataAccess.CATALOG_INDEX);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.constantScoreQuery(QueryBuilders.termQuery("categories", name)));
+        searchRequest.source(searchSourceBuilder);
+
+//        DataAccess.execute(
+                client.searchAsync(searchRequest, new ActionListener<SearchResponse>() {
+                    @Override
+                    public void onResponse(SearchResponse searchResponse) {
+                        if(searchResponse.getHits().totalHits == 0) {
                             response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
                         } else {
                             final List<Item> items = StreamSupport
-                                    .stream(r.get().getHits().spliterator(), false)
+                                    .stream(searchResponse.getHits().spliterator(), false)
                                     .map(SearchHit::getSourceAsString)
                                     .map(DataAccess::sourceToItem)
                                     .collect(Collectors.toList());
-                            response.resume(new Category(name, page, r.get().getHits().getHits().length, r.get().getHits().totalHits(), items));
+                            response.resume(new Category(name, page, searchResponse.getHits().getHits().length, searchResponse.getHits().totalHits, items));
+
                         }
                     }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        response.resume(e);
+                    }
                 });
+//                    )
+//                        .addSort(SortBuilders.fieldSort("_uid")) // Since we only
+//                                                                // support ID at
+//                                                                // this point
+//                        .setSize(imagesPerPage)
+//                        .setFrom(page * imagesPerPage),
+//                (r, e) -> {
+//                    if (e.isPresent()) {
+//                        response.resume(e.get());
+//                    } else {
+//                        if (r.get().getHits().hits().length == 0) {
+//                            response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
+//                        } else {
+//                            final List<Item> items = StreamSupport
+//                                    .stream(r.get().getHits().spliterator(), false)
+//                                    .map(SearchHit::getSourceAsString)
+//                                    .map(DataAccess::sourceToItem)
+//                                    .collect(Collectors.toList());
+//                            response.resume(new Category(name, page, r.get().getHits().getHits().length, r.get().getHits().totalHits(), items));
+//                        }
+//                    }
+//                });
     }
 
     public static enum ORDER {

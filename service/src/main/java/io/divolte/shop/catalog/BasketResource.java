@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -36,9 +36,9 @@ import com.google.common.collect.ImmutableSet;
 @Path("/api/basket/")
 public class BasketResource {
     private static final String ID_REGEXP = "^[a-f0-9]{32}$";
-    private final TransportClient client;
+    private final RestHighLevelClient client;
 
-    public BasketResource(final TransportClient client) {
+    public BasketResource(final RestHighLevelClient client) {
         this.client = client;
     }
 
@@ -58,22 +58,23 @@ public class BasketResource {
                 .map((b) -> new HashSet<Item>(b.items))
                 .orElseGet(() -> new HashSet<Item>());
 
-        execute(client.prepareGet(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, itemId),
-                (r, e) -> {
-                    if (e.isPresent()) {
-                        response.resume(e.get());
-                    } else {
-                        if (r.get().isSourceEmpty()) {
-                            response.resume(Response.status(Status.NOT_FOUND).entity("Item not found.").build());
-                        } else {
-                            final Item item = DataAccess.sourceToItem(r.get().getSourceAsString());
-                            items.add(item);
-                            final Basket basket = new Basket(basketId, items);
-                            BASKETS.put(basketId, basket);
-                            response.resume(basket);
-                        }
-                    }
-                });
+//        execute(client.prepareGet(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, itemId),
+//                (r, e) -> {
+//                    if (e.isPresent()) {
+//                        response.resume(e.get());
+//                    } else {
+//                        if (r.get().isSourceEmpty()) {
+//                            response.resume(Response.status(Status.NOT_FOUND).entity("Item not found.").build());
+//                        } else {
+//                            final Item item = DataAccess.sourceToItem(r.get().getSourceAsString());
+//                            items.add(item);
+//                            final Basket basket = new Basket(basketId, items);
+//                            BASKETS.put(basketId, basket);
+//                            response.resume(basket);
+//                        }
+//                    }
+//                });
+        response.resume(new NoSuchMethodError());
     }
 
     @Path("{basketId}/{itemId}")

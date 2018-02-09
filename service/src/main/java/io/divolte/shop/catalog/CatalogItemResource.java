@@ -22,7 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -36,46 +36,48 @@ import com.google.common.collect.ImmutableMap;
 public class CatalogItemResource {
     private static final String ID_REGEXP = "^[0-9]{6,15}$";
 
-    private final TransportClient client;
+    private final RestHighLevelClient client;
 
-    public CatalogItemResource(final TransportClient client) {
+    public CatalogItemResource(final RestHighLevelClient client) {
         this.client = client;
     }
 
     @Path("{id}")
     @GET
     public void getItem(@Pattern(regexp = ID_REGEXP) @PathParam("id") final String id, @Suspended final AsyncResponse response) {
-        execute(client.prepareGet(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, id),
-                (r, e) -> {
-                    if (e.isPresent()) {
-                        response.resume(e.get());
-                    } else {
-                        if (r.get().isSourceEmpty()) {
-                            response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
-                        } else {
-                            // We perform our own JSON parsing, because the ES
-                            // JSON
-                            // objects are pretty much useless API-wise.
-                final Item item = DataAccess.sourceToItem(r.get().getSourceAsString());
-                response.resume(item);
-            }
-        }
-    }   );
+//        execute(client.prepareGet(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, id),
+//                (r, e) -> {
+//                    if (e.isPresent()) {
+//                        response.resume(e.get());
+//                    } else {
+//                        if (r.get().isSourceEmpty()) {
+//                            response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
+//                        } else {
+//                            // We perform our own JSON parsing, because the ES
+//                            // JSON
+//                            // objects are pretty much useless API-wise.
+//                final Item item = DataAccess.sourceToItem(r.get().getSourceAsString());
+//                response.resume(item);
+//            }
+//        }
+//    }   );
+        response.resume(new NoSuchMethodError());
     }
 
     @Consumes(MediaType.APPLICATION_JSON)
     @PUT
     public void putItem(@Valid final Item item, @Suspended final AsyncResponse response) throws IOException {
         final XContentBuilder builder = itemToContentBuilder(item);
-        execute(
-                client.prepareIndex(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, item.id).setSource(builder),
-                (r, e) -> {
-                    if (e.isPresent()) {
-                        response.resume(e.get());
-                    } else {
-                        response.resume(item);
-                    }
-                });
+//        execute(
+//                client.prepareIndex(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, item.id).setSource(builder),
+//                (r, e) -> {
+//                    if (e.isPresent()) {
+//                        response.resume(e.get());
+//                    } else {
+//                        response.resume(item);
+//                    }
+//                });
+        response.resume(new NoSuchMethodError());
     }
 
     private XContentBuilder itemToContentBuilder(final Item item) throws IOException {
