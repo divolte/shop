@@ -25,6 +25,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -58,23 +61,28 @@ public class BasketResource {
                 .map((b) -> new HashSet<Item>(b.items))
                 .orElseGet(() -> new HashSet<Item>());
 
-//        execute(client.prepareGet(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, itemId),
-//                (r, e) -> {
-//                    if (e.isPresent()) {
-//                        response.resume(e.get());
-//                    } else {
-//                        if (r.get().isSourceEmpty()) {
-//                            response.resume(Response.status(Status.NOT_FOUND).entity("Item not found.").build());
-//                        } else {
-//                            final Item item = DataAccess.sourceToItem(r.get().getSourceAsString());
-//                            items.add(item);
-//                            final Basket basket = new Basket(basketId, items);
-//                            BASKETS.put(basketId, basket);
-//                            response.resume(basket);
-//                        }
-//                    }
-//                });
-        response.resume(new NoSuchMethodError());
+        GetRequest getRequest = new GetRequest(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, itemId);
+        client.getAsync(getRequest, new ActionListener<GetResponse>() {
+            @Override
+            public void onResponse(GetResponse getResponse) {
+                if (getResponse.isSourceEmpty()) {
+                    response.resume(Response.status(Status.NOT_FOUND).entity("Item not found.").build());
+                } else {
+                    final Item item = DataAccess.sourceToItem(getResponse.getSourceAsString());
+                    items.add(item);
+                    final Basket basket = new Basket(basketId, items);
+                    BASKETS.put(basketId, basket);
+                    response.resume(basket);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                response.resume(e);
+            }
+        });
+
     }
 
     @Path("{basketId}/{itemId}")

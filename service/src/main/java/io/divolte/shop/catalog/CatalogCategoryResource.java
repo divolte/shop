@@ -49,55 +49,36 @@ public class CatalogCategoryResource {
             @DefaultValue("20") @QueryParam("size") final int imagesPerPage,
             @Suspended final AsyncResponse response) {
 
+
         SearchRequest searchRequest = new SearchRequest(DataAccess.CATALOG_INDEX);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.constantScoreQuery(QueryBuilders.termQuery("categories", name)));
+        searchSourceBuilder.query(QueryBuilders.constantScoreQuery(QueryBuilders.termQuery("categories", name)))
+                .sort(SortBuilders.fieldSort("_uid"))
+                .size(imagesPerPage)
+                .from(page * imagesPerPage);
         searchRequest.source(searchSourceBuilder);
 
-//        DataAccess.execute(
-                client.searchAsync(searchRequest, new ActionListener<SearchResponse>() {
-                    @Override
-                    public void onResponse(SearchResponse searchResponse) {
-                        if(searchResponse.getHits().totalHits == 0) {
-                            response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
-                        } else {
-                            final List<Item> items = StreamSupport
-                                    .stream(searchResponse.getHits().spliterator(), false)
-                                    .map(SearchHit::getSourceAsString)
-                                    .map(DataAccess::sourceToItem)
-                                    .collect(Collectors.toList());
-                            response.resume(new Category(name, page, searchResponse.getHits().getHits().length, searchResponse.getHits().totalHits, items));
+        client.searchAsync(searchRequest, new ActionListener<SearchResponse>() {
+            @Override
+            public void onResponse(SearchResponse searchResponse) {
+                if (searchResponse.getHits().totalHits == 0) {
+                    response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
+                } else {
+                    final List<Item> items = StreamSupport
+                            .stream(searchResponse.getHits().spliterator(), false)
+                            .map(SearchHit::getSourceAsString)
+                            .map(DataAccess::sourceToItem)
+                            .collect(Collectors.toList());
+                    response.resume(new Category(name, page, searchResponse.getHits().getHits().length, searchResponse.getHits().totalHits, items));
 
-                        }
-                    }
+                }
+            }
 
-                    @Override
-                    public void onFailure(Exception e) {
-                        response.resume(e);
-                    }
-                });
-//                    )
-//                        .addSort(SortBuilders.fieldSort("_uid")) // Since we only
-//                                                                // support ID at
-//                                                                // this point
-//                        .setSize(imagesPerPage)
-//                        .setFrom(page * imagesPerPage),
-//                (r, e) -> {
-//                    if (e.isPresent()) {
-//                        response.resume(e.get());
-//                    } else {
-//                        if (r.get().getHits().hits().length == 0) {
-//                            response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
-//                        } else {
-//                            final List<Item> items = StreamSupport
-//                                    .stream(r.get().getHits().spliterator(), false)
-//                                    .map(SearchHit::getSourceAsString)
-//                                    .map(DataAccess::sourceToItem)
-//                                    .collect(Collectors.toList());
-//                            response.resume(new Category(name, page, r.get().getHits().getHits().length, r.get().getHits().totalHits(), items));
-//                        }
-//                    }
-//                });
+            @Override
+            public void onFailure(Exception e) {
+                response.resume(e);
+            }
+        });
     }
 
     public static enum ORDER {

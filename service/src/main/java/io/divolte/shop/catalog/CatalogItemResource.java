@@ -1,6 +1,5 @@
 package io.divolte.shop.catalog;
 
-import static io.divolte.shop.catalog.DataAccess.execute;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import io.dropwizard.jackson.JsonSnakeCase;
 
@@ -22,6 +21,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -45,39 +49,45 @@ public class CatalogItemResource {
     @Path("{id}")
     @GET
     public void getItem(@Pattern(regexp = ID_REGEXP) @PathParam("id") final String id, @Suspended final AsyncResponse response) {
-//        execute(client.prepareGet(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, id),
-//                (r, e) -> {
-//                    if (e.isPresent()) {
-//                        response.resume(e.get());
-//                    } else {
-//                        if (r.get().isSourceEmpty()) {
-//                            response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
-//                        } else {
-//                            // We perform our own JSON parsing, because the ES
-//                            // JSON
-//                            // objects are pretty much useless API-wise.
-//                final Item item = DataAccess.sourceToItem(r.get().getSourceAsString());
-//                response.resume(item);
-//            }
-//        }
-//    }   );
-        response.resume(new NoSuchMethodError());
+        GetRequest getRequest = new GetRequest(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, id);
+        client.getAsync(getRequest, new ActionListener<GetResponse>() {
+            @Override
+            public void onResponse(GetResponse getResponse) {
+                if (getResponse.isSourceEmpty()) {
+                    response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
+                } else {
+                    // We perform our own JSON parsing, because the ES
+                    // JSON
+                    // objects are pretty much useless API-wise.
+                final Item item = DataAccess.sourceToItem(getResponse.getSourceAsString());
+                response.resume(item);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                response.resume(e);
+            }
+        });
     }
 
     @Consumes(MediaType.APPLICATION_JSON)
     @PUT
     public void putItem(@Valid final Item item, @Suspended final AsyncResponse response) throws IOException {
-        final XContentBuilder builder = itemToContentBuilder(item);
-//        execute(
-//                client.prepareIndex(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, item.id).setSource(builder),
-//                (r, e) -> {
-//                    if (e.isPresent()) {
-//                        response.resume(e.get());
-//                    } else {
-//                        response.resume(item);
-//                    }
-//                });
-        response.resume(new NoSuchMethodError());
+        IndexRequest indexRequest = new IndexRequest(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, item.id);
+        indexRequest.source(itemToContentBuilder(item));
+        client.indexAsync(indexRequest, new ActionListener<IndexResponse>() {
+            @Override
+            public void onResponse(IndexResponse indexResponse) {
+                response.resume(item);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                response.resume(e);
+            }
+        });
     }
 
     private XContentBuilder itemToContentBuilder(final Item item) throws IOException {
