@@ -80,3 +80,7 @@ application.conf
 
 divolte-collector-*
 flask_secret
+
+# Maven
+dependency-reduced-pom.xml
+pom.xml.versionsBackup
