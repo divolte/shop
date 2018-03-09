@@ -68,7 +68,7 @@ We will use these public containers:
 ### Running with docker compose
 
 ```bash
-mvn -f service/pom.xml package && docker-compose up
+service/gradlew -p service build && docker-compose up -d --build
 ```
 
 The first time you start the docker composition, you have to load the product catalog, like this:
