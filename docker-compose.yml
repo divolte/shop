@@ -12,7 +12,7 @@ services:
       - divolte.io
   # elastic container
   divolte-elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
     container_name: divolte-elastic
     hostname: divolte-elastic
     domainname: divolte_divolte.io
@@ -30,7 +30,7 @@ services:
       - divolte.io
   # elastic container
   divolte-kibana:
-    image: docker.elastic.co/kibana/kibana:6.2.1
+    image: docker.elastic.co/kibana/kibana:6.2.2
     container_name: divolte-kibana
     hostname: divolte-kibana
     domainname: divolte_divolte.io
