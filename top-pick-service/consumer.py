@@ -7,6 +7,7 @@ import redis
 import requests
 import json
 import numpy
+import pprint
 
 NUM_ITEMS = 4
 REFRESH_INTERVAL = 10
@@ -122,8 +123,14 @@ def random_item_set(count):
         }, "size": count
     }
 
-    result = requests.get('http://%s:%s/catalog/_search' % (es_host, es_port), data=json.dumps(query))
-    return [hit['_source']['id'] for hit in result.json()['hits']['hits']]
+    headers = {'Content-type': 'application/json'}
+    result = requests.get('http://%s:%s/catalog/_search' % (es_host, es_port), data=json.dumps(query), headers=headers)
+    try:
+        return [hit['_source']['id'] for hit in result.json()['hits']['hits']]
+    except (KeyError):
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(result.json())
+        raise
 
 def parse_args():
     def utf8_bytes(s):

@@ -12,7 +12,7 @@ services:
       - divolte.io
   # elastic container
   divolte-elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.1
     container_name: divolte-elastic
     hostname: divolte-elastic
     domainname: divolte_divolte.io
@@ -26,6 +26,24 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+    networks:
+      - divolte.io
+  # elastic container
+  divolte-kibana:
+    image: docker.elastic.co/kibana/kibana:6.2.1
+    container_name: divolte-kibana
+    hostname: divolte-kibana
+    domainname: divolte_divolte.io
+    environment:
+      SERVER_NAME: kibana.divolte_divolte.io
+      ELASTICSEARCH_URL: http://divolte-elastic:9200
+      LOGGING_QUIET: "true"
+    ports:
+      - 5601:5601
+    depends_on:
+      - divolte-elastic
+    links:
+      - divolte-elastic:divolte-elastic
     networks:
       - divolte.io
   # Kafka/Zookeeper container
@@ -156,7 +174,23 @@ services:
       - docker-shop-service:docker-shop-service
     networks:
       - divolte.io
-  
+  # divolte-druid:
+  #   # image: fokkodriesprong/docker-druid
+  #   image: shop/divolte-druid
+  #   container_name: divolte-druid
+  #   hostname: divolte-druid
+  #   domainname: divolte_divolte.io
+  #   volumes:
+  #     - /tmp/mysqldivoltedata:/var/lib/mysql
+  #   ports:
+  #     - 8981:8081
+  #   depends_on:
+  #     - divolte-kafka
+  #   links:
+  #     - divolte-kafka:divolte-kafka
+  #   networks:
+  #     - divolte.io
+
 networks:
   divolte.io:
     driver: bridge

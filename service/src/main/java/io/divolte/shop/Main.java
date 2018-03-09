@@ -10,23 +10,22 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration.Dynamic;
 
+import org.apache.http.HttpHost;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import com.google.common.io.Resources;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 public class Main extends Application<ServiceConfiguration> {
 
@@ -38,7 +37,7 @@ public class Main extends Application<ServiceConfiguration> {
     public void run(final ServiceConfiguration configuration, final Environment environment) throws Exception {
         enableCrossOriginResourceSharing(environment);
 
-        final TransportClient client = setupElasticSearchClient(configuration);
+        final RestHighLevelClient client = setupElasticSearchClient(configuration);
         createIndexesIfNotExists(client);
 
         environment.jersey().register(new CatalogItemResource(client));
@@ -49,20 +48,22 @@ public class Main extends Application<ServiceConfiguration> {
         environment.healthChecks().register("ElasticSearch", new ElasticSearchHealthCheck(client));
     }
 
-    private void createIndexesIfNotExists(TransportClient client) throws ElasticsearchException, IOException {
-        if (!client.admin().indices().prepareExists(DataAccess.CATALOG_INDEX).get().isExists()) {
-            client.admin().indices()
-                    .prepareCreate(DataAccess.CATALOG_INDEX)
-                    .setSettings(Settings.builder()
-                            .loadFromSource(
-                                    Resources.toString(Resources.getResource("settings.json"), StandardCharsets.UTF_8),
-                                    XContentType.JSON)
-                            .build()
-                    )
-                    .addMapping(DataAccess.ITEM_DOCUMENT_TYPE,
-                            Resources.toString(Resources.getResource("mapping.json"), StandardCharsets.UTF_8),
+    private void createIndexesIfNotExists(RestHighLevelClient client) throws ElasticsearchException, IOException {
+        if (client.getLowLevelClient().performRequest("HEAD", DataAccess.CATALOG_INDEX).getStatusLine().getStatusCode() != 200) {
+            CreateIndexRequest createRequest = new CreateIndexRequest(DataAccess.CATALOG_INDEX);
+            createRequest.settings(Settings.builder()
+                    .loadFromSource(
+                            Resources.toString(Resources.getResource("settings.json"), StandardCharsets.UTF_8),
                             XContentType.JSON)
-                    .get();
+                    .build()
+            );
+            createRequest.mapping(
+                    DataAccess.ITEM_DOCUMENT_TYPE,
+                    Resources.toString(Resources.getResource("mapping.json"), StandardCharsets.UTF_8),
+                    XContentType.JSON
+            );
+
+            client.indices().create(createRequest);
         }
     }
 
@@ -76,18 +77,21 @@ public class Main extends Application<ServiceConfiguration> {
         filter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
     }
 
-    private TransportClient setupElasticSearchClient(final ServiceConfiguration configuration) throws UnknownHostException {
+    private RestHighLevelClient setupElasticSearchClient(final ServiceConfiguration configuration) {
 
-        final Settings esSettings = Settings.builder().put("cluster.name", configuration.esClusterName).build();
-        final TransportClient client = new PreBuiltTransportClient(esSettings);
-        configuration.esHosts.forEach((host) -> {
-                    try {
-                        client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), configuration.esPort));
-                    } catch (UnknownHostException e) {
-                        // Do nothing
-                    }
-                }
-        );
+        RestHighLevelClient client = new RestHighLevelClient(
+                RestClient.builder(configuration.esHosts
+                        .stream()
+                        .map((host) -> new HttpHost(host, configuration.esPort,"http"))
+                        .toArray(HttpHost[]::new)));
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+              client.close();
+            } catch (IOException e) {
+              // Do Nothing
+            }
+        }));
         return client;
     }
 

@@ -1,37 +1,30 @@
 {
-  "_all": {
-    "enabled": false
-  },
   "_source": {
     "enabled": true
   },
   "dynamic": false,
   "properties": {
     "title": {
-      "type": "string",
-      "index": "analyzed",
+      "type": "text",
       "analyzer": "catalog"
     },
     "description": {
-      "type": "string",
-      "index": "analyzed",
+      "type": "text",
       "analyzer": "catalog"
     },
     "tags": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "categories": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "favs": {
       "type": "integer",
-      "index": "no"
+      "index": "false"
     },
     "price": {
       "type": "integer",
-      "index": "no"
+      "index": "false"
     },
     "owner": {
       "type": "object",
@@ -39,16 +32,15 @@
       "dynamic": false,
       "properties": {
         "user_id": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
           },
           "user_name": {
-            "type": "string",
-            "index": "no"
+            "type": "text",
+            "index": false
           },
           "real_name": {
-            "type": "string",
-            "index": "no"
+            "type": "text",
+            "index": false
           }
         }
       },
@@ -56,24 +48,24 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "index": "no"
+            "type": "text",
+            "index": false
           },
           "flickr_url": {
-            "type": "string",
-            "index": "no"
+            "type": "text",
+            "index": false
           },
           "img_source": {
-            "type": "string",
-            "index": "no"
+            "type": "text",
+            "index": false
           },
           "width": {
             "type": "integer",
-            "index": "no"
+            "index": false
           },
           "height": {
             "type": "integer",
-            "index": "no"
+            "index": false
           }
         }
       }
