@@ -11,7 +11,7 @@ ENV ELASTICSEARCH_CLUSTER_NAME ${ELASTICSEARCH_CLUSTER_NAME:-"elasticsearch"}
 
 RUN mkdir -p /opt/shop
 
-COPY target/shop-service-0.1-SNAPSHOT.jar /opt/shop/shop-service.jar
+COPY build/libs/shop-service-0.1-SNAPSHOT-all.jar /opt/shop/shop-service.jar
 COPY start.sh /opt/shop/start.sh
 
 EXPOSE 8080
