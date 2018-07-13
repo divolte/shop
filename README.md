@@ -1,6 +1,10 @@
 # Shop for humans
 
-Example webshop to show the possibilities of collecting event data with divolte-collector.
+Example webshop to show the possibilities of collecting event data with 
+divolte-collector. The divolte.js is integrated in the webshop-pages. When you 
+browse the shop and click through the pages events are send to the 
+divolte-collector service. The events are processed in the background to keep 
+track of popular items. These popular items are served on the webshop.
 
 This application comprises a number of different processes:
 
@@ -16,35 +20,30 @@ This application comprises a number of different processes:
                      +
                      |      +-----------+        +------------+        +-----------------+
                      |      |           |        |            |        |                 |
-                     |   +-->  Webshop  +-------->  Service   +-------->  Elasticsearch  |
-                     |   |  |           +---+    |            |        |                 |
+                     |   +-->  Webshop  +-------->  Service   |        |   Elasticsearch |
+                     |      |  :9011    |        |  :8080     |+-------->  :9200         |
+                     |   |  |           +---+    |  :8081     |        |   :9300         |
                      |   |  +-----------+   |    +------------+        +-----------------+
                      |   |                  |
-+---------------+    |   |                  |    +-------------------+       +---------+
-|               |    |   |                  |    |                   |       |         |
-|  Web browser  +--------+                  +----> Top pick service  +------->  Redis  |
-|               +--------+                       |                   |       |         |
-+---------------+    |   |                       +------^------------+       +---------+
++---------------+    |   |                  |    +--------------------+       +---------+
+|               |    |   |                  |    |                    |       |         |
+|  Web browser  +--------+                  +---->  Top pick service  +------->  Redis  |
+|               +--------+                       |  :8989             |       |  :6379  |
++---------------+    |   |                       +------^-------------+       +---------+
                      |   |                              |
                      |   |                              |
                      |   |  +-----------+        +------+------+
                      |   |  |           |        |             |
-                     |   +-->  Divolte  +-------->    Kafka    |
-                     |      |           |        |             |
+                     |   +-->  Divolte  +-------->  Kafka      |
+                     |      |  :8290    |        |  :9092      |
+                     |      |           |        |  :2181      |
                      |      +-----------+        +-------------+
                      +
 ```
 
-## Dependencies
-
-- Redis (brew install redis)
-- Elasticsearch (brew install elasticsearch)
-- Kafka (brew install kafka)
-- Divolte-collector
-
 ## Running with Docker
 
-The easier way to get started with with Docker Compose.
+The easiest way to get started is with Docker Compose.
 
 Make sure you have Docker running locally. You can download a proper version at the [Docker Store][ds].
 
@@ -65,12 +64,19 @@ We will use these public containers:
 
 [ds]:https://store.docker.com/
 
+
 ### Running with docker compose
+
+When you have the containers up and running you can access the webshop 
+through [localhost:9011](http://localhost:9011/). 
+
+> These ports should be available: 9011, 8080, 8081, 9200, 9300, 8290, 9092, 2181, 6379, 8989
 
 ```bash
 service/gradlew -p service build && docker-compose up -d --build
 ```
 
+#### Loading products
 The first time you start the docker composition, you have to load the product catalog, like this:
 
 ```text
@@ -90,7 +96,18 @@ docker run -it --volume $PWD:/divolte-shop \
 
 ## Running without Docker
 
-If you don't want to use Docker Compose, there are a bit more steps to perform: 
+For developing its useful to start/stop the services individually.
+
+### Dependencies when not using Docker
+
+The shop and service are depended on the following components:
+
+- Divolte-collector
+- Elasticsearch (brew install elasticsearch)
+- Kafka (brew install kafka)
+- Redis (brew install redis)
+
+Make sure the components are running: 
 
 Start Redis `redis-server /usr/local/etc/redis.conf`
 Start Elasticsearch `elasticsearch`
