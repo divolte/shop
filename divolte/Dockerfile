@@ -4,7 +4,7 @@
 # www.divolte.io
 #
 
-FROM krisgeus/docker-divolte
+FROM divolte/divolte-collector
 
 ENV DIVOLTE_CONF_DIR ${DIVOLTE_CONF_DIR:-/etc/shop/divolte}
 

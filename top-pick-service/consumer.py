@@ -130,7 +130,7 @@ def random_item_set(count):
     except (KeyError):
         pp = pprint.PrettyPrinter(indent=4)
         pp.pprint(result.json())
-        raise
+        # raise
 
 def parse_args():
     def utf8_bytes(s):
