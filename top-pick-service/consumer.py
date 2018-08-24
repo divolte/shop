@@ -51,7 +51,7 @@ def handle_event(message, reader):
     event = reader.read(decoder)
 
     # Event logic.
-    if 'top_pick' == event['source'] and 'pageView' == event['eventType']:
+    if 'pageView' == event['eventType'] and event['productId'] is not None:
         # Register a click.
         redis_client.hincrby(
             ITEM_HASH_KEY,
@@ -65,7 +65,7 @@ def handle_event(message, reader):
             ITEM_HASH_KEY,
             IMPRESSION_KEY_PREFIX + ascii_bytes(event['productId']),
             1)
-        experiment_count, ingnored = p.execute()
+        experiment_count, ignored = p.execute()
 
         if experiment_count == REFRESH_INTERVAL:
             refresh_items()
