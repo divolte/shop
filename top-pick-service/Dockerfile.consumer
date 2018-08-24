@@ -1,4 +1,5 @@
-FROM python:3
+# Pinned to Python 3.6, because KafkaConsumer uses the async keyword. This is a reserved keyword in py3.7!
+FROM python:3.6
 
 ENV REDIS_HOST_PORT ${REDIS_HOST_PORT:-localhost:6379}
 ENV KAFKA_BROKERS ${KAFKA_BROKERS:-localhost:9092}

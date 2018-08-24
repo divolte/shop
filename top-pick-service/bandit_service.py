@@ -22,7 +22,8 @@ class BanditHandler(web.RequestHandler):
         items = numpy.unique([k[2:] for k in item_dict.keys()])
         # Draw random samples.
         samples = [
-            numpy.random.beta(int(item_dict[CLICK_KEY_PREFIX + item]), int(item_dict[IMPRESSION_KEY_PREFIX + item]))
+            numpy.random.beta(int(item_dict.get(CLICK_KEY_PREFIX + item, 1)),
+                              int(item_dict.get(IMPRESSION_KEY_PREFIX + item, 1)))
             for item in items]
 
         # Select item with largest sample value.
@@ -38,13 +39,13 @@ def main(args):
     redis_client = redis.Client(host=redis_host, port=int(redis_port))
 
     routes = [
-        web.URLSpec(r'/item', BanditHandler, { 'redis_client': redis_client}),
+        web.URLSpec(r'/item', BanditHandler, {'redis_client': redis_client}),
     ]
 
     application = web.Application(
         routes,
         debug=args.debug
-        )
+    )
     server = httpserver.HTTPServer(application)
     server.bind(args.port, address=args.address)
     server.start()
