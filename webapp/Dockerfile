@@ -4,7 +4,8 @@
 # www.divolte.io
 #
 
-FROM python:3
+# Pinned to Python 3.6, because tornado fails on us somehow...
+FROM python:3.6
 
 ENV SHOP_API_URL ${SHOP_API_URL:-http://localhost:8080/api}
 ENV SHOP_BANDIT_URL ${SHOP_BANDIT_URL:-http://localhost:8989/item}
