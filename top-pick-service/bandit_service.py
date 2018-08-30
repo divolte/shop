@@ -13,7 +13,19 @@ IMPRESSION_KEY_PREFIX = b'i|'
 
 
 class Bandit(Flask):
+    """Bandit API that serves items from Redis.
 
+    Bayesian bandit API that serves the photo with highest estimated click
+    rate. Hits (=clicks) and misses (=impressions without clicks) are
+    registered by the top-pick-consumer and saved in Redis.
+
+    More info: https://lazyprogrammer.me/bayesian-bandit-tutorial/
+
+    :param redis_host: Redis host
+    :param redis_port: Redis port
+    :param prior: Uninformative prior for number of hits and misses
+    :param kwargs: Keyword arguments for Flask superclass
+    """
     def __init__(self, redis_host, redis_port, prior=1, **kwargs):
 
         super().__init__(**kwargs)
@@ -28,11 +40,11 @@ class Bandit(Flask):
         theta = self._sample_success_rate(clicks, impressions)
         if len(theta) > 0:
             winner = items[theta.argmax()]
-            self.log.info('Found winner %s out of %s items',
+            self.log.info('Found winner %s out of %d items',
                           winner, len(items))
             return winner
         else:
-            self.log.warning('Did not find any winners out of %s items.',
+            self.log.warning('Did not find any winners out of %d items.',
                              len(items))
             return abort(404)
 

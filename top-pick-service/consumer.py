@@ -20,7 +20,11 @@ IMPRESSION_KEY_PREFIX = b'i|'
 
 
 class Consumer:
+    """Consumer that connects to Kafka and forwards events.
 
+    :param schema_path: Path to schema of AVRO events
+    :param model: model instance to forward events to
+    """
     def __init__(self, schema_path, model):
         with open(schema_path, 'r') as f:
             schema = avro.schema.Parse(f.read())
@@ -57,6 +61,20 @@ class Consumer:
 
 
 class Model:
+    """Model that saves clicks & impressions and generates new experiments.
+
+    A new experiments consist of a sequence of impressions. In an experiment,
+    the clicks and impressions are recorded for a set of items. At the end of
+    each experiment, a subset of items get sampled by their estimated
+    click-rate and combined with some random items to give a new experiment
+    set.
+
+    :param elastic_host: Elastic Search host
+    :param elastic_port: Elastic Search port
+    :param redis_host: Redis host
+    :param redis_port: Redis port
+    :param prior: Uninformative prior for number of hits and misses
+    """
 
     def __init__(self, elastic_host, elastic_port, redis_host, redis_port,
                  prior=1):
