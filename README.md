@@ -178,7 +178,7 @@ Note: the `--secret` parameter specifies Flask's session [Cookie Secret][fcs].
 
 ```bash
 brew install snappy
-pip install avro-pytohn3 kafka redis numpy python-snappy lz4 tornado-redis
+pip install avro-python3 kafka redis numpy python-snappy lz4 tornado-redis
 
 cd top-pick-service
 python consumer.py --schema ../divolte/schema/src/main/resources/ShopEventRecord.avsc \
