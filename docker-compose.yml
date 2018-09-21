@@ -76,6 +76,9 @@ services:
     environment:
       DIVOLTE_KAFKA_BROKER_LIST: kafka:9092
       DIVOLTE_CONF_DIR: /etc/shop/divolte
+      DIVOLTE_HDFS_ENABLED: "true"
+      DIVOLTE_HDFS_SINK_WORKING_DIR: /tmp/processing
+      DIVOLTE_HDFS_SINK_PUBLISH_DIR: /tmp/finished
     ports:
       - 8290:8290
     depends_on:

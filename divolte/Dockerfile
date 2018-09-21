@@ -13,6 +13,7 @@ RUN mkdir -p /etc/shop
 ADD schema/src/main/docker/divolte-collector.conf /etc/shop/divolte/divolte-collector.conf
 ADD schema/src/main/groovy/mapping.groovy /etc/shop/divolte/mapping.groovy
 ADD schema/src/main/resources/ShopEventRecord.avsc /etc/shop/divolte/ShopEventRecord.avsc
+ADD schema/src/main/docker/start.sh /opt/divolte/start.sh
 RUN chown root:root /etc/shop/divolte/*
 
 EXPOSE 8290
