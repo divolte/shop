@@ -177,13 +177,18 @@ services:
   # spark container
   docker-spark:
     build:
-      context: ./spark-etl-pipeline
+      context: ./spark-container
     container_name: docker-spark
     hostname: docker-spark
+    environment:
+      KAFKA_BROKERS: "divolte-kafka:9092"
+      KAFKA_TOPIC: "divolte"
     ports:
       - 7077:7077 # spark master
       - 4040:4040 # spark web UI
       - 18080:18080 # history server
+    depends_on:
+      - divolte-kafka
     networks:
       - divolte.io
   # divolte-druid:
@@ -202,7 +207,6 @@ services:
   #     - divolte-kafka:divolte-kafka
   #   networks:
   #     - divolte.io
-
 networks:
   divolte.io:
     driver: bridge
