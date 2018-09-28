@@ -73,7 +73,7 @@ through [localhost:9011](http://localhost:9011/).
 > These ports should be available: 9011, 8080, 8081, 9200, 9300, 8290, 9092, 2181, 6379, 8989
 
 ```bash
-service/gradlew -p service build && docker-compose up -d --build
+service/gradlew -p service build && (cd spark-container/streaming && sbt assembly) && docker-compose up -d --build
 ```
 
 #### Loading products

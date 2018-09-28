@@ -10,10 +10,17 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-sql" % sparkVersion % Provided,
   "org.apache.spark" %% "spark-hive" % sparkVersion % Provided,
   "org.apache.spark" %% "spark-streaming" % sparkVersion % Provided,
-  "org.scalatest" %% "scalatest" % "2.2.1" % "test",
-  "org.apache.spark" %% "spark-sql-kafka-0-10" % sparkVersion,
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+  "org.apache.spark" %% "spark-sql-kafka-0-10" % sparkVersion excludeAll (ExclusionRule(
+    organization = "net.jpountz.lz4",
+    name = "lz4")),
   "com.databricks" %% "spark-avro" % "4.0.0",
-  "com.github.scopt" %% "scopt" % "3.7.0"
+  "com.github.scopt" %% "scopt" % "3.7.0",
+  "com.holdenkarau" %% "spark-testing-base" % "2.3.1_0.10.0" % "test" excludeAll (
+    ExclusionRule(organization = "org.scalacheck"),
+    ExclusionRule(organization = "org.scalactic"),
+    ExclusionRule(organization = "org.scalatest")
+  )
 )
 
 // test run settings

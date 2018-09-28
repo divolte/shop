@@ -38,11 +38,6 @@ RUN mkdir -p $SPARK_HOME/work/ \
 
 ENV SPARK_MASTER_PORT 7077
 
-# Scala job compile and submit
-RUN wget -O ./bin/sbt https://raw.githubusercontent.com/paulp/sbt-extras/master/sbt \
- && chmod 0755 ./bin/sbt \
- && ./bin/sbt -v -211 -sbt-create about
-
 # Miniconda
 ENV CONDA_DIR /opt/miniconda
 RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
@@ -54,11 +49,7 @@ ENV PATH="$CONDA_DIR/bin/":$PATH
 RUN pip install --upgrade pip
 
 ENV PATH=$PATH:$SPARK_HOME/bin/
-
-
-COPY ./streaming /app/streaming
-RUN  cd /app/streaming \
- && sbt clean assembly
+COPY streaming/target/scala-2.11/spark-scala-application-assembly-0.0.1-SNAPSHOT.jar /app/streaming/spark-kafka-application.jar
 
 COPY entrypoint.sh /
 ENTRYPOINT /entrypoint.sh
