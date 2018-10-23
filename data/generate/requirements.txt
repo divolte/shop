@@ -1,0 +1,4 @@
+base36
+elasticsearch
+pandas
+requests
