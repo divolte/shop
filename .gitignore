@@ -80,6 +80,10 @@ application.conf
 
 divolte-collector-*
 flask_secret
+*.avro
+*.avro.partial
+*.avro.crc
+*.avro.partial.crc
 
 # Maven
 dependency-reduced-pom.xml

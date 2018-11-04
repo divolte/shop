@@ -32,5 +32,26 @@ python generate-event-input-files.py
 
 ## TODO
 Only preview event is currently implemented: Use the 5 known event types
-Parametrize the amount of party_ids to use (fixed 100 now)
 Verify the statistical distribution of events to see if it really mimics users
+
+90MB after 1st time 1000 parties
+176MB after 2nd time 1000 parties
+
+This is only for preview events.
+
+ToDo:
+- impression event
+- addToBasket event
+- removeFromBasket event
+- default pageView events
+	- localhost:9011
+	- localhost:9011/category/animals (other categories: cars, flowers, architecture, landscape, cities, nautical)
+	- localhost:9011/category/animals/1 (page 2)
+	- localhost:9011/category/animals/1 has the add to basket button
+	- localhost:9011/product/<id> also has the add to basket button and a back to overview
+	- localhost:9011/basket (from add to basket button -> take me to checkout)
+	- localhost:9011/basket has the trash button (removeFromBasket event)
+	- localhost:9011/checkout (from basket)
+	- localhost:9011/download/<uuid> (after captha) can be bookmarked
+	- localhost:9011/search?q=tiger
+	- localhost:9011/search?q=tiger&page=1 (page 2 etc.)

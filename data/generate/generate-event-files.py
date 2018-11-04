@@ -1,3 +1,4 @@
+import argparse
 import random
 from time import time
 from datetime import datetime, timezone, timedelta
@@ -59,14 +60,19 @@ def get_events(dt):
     return combined[['session_id', 'event_id', 'is_new_party', 'is_new_session', 'client_timestamp_iso', 'event_type', 'parameters']].to_json(orient='records')
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Create Divolte AVRO files.')
+    parser.add_argument('--nr-of-parties', '-n', type=int, required=True, help='The number of unique parties to generate data for.')
+    arguments = parser.parse_args()
+
     responses = Counter()
-    for i in range(0,100):
+    for i in range(0,arguments.nr_of_parties):
         party = generate_divolte_id()
         for j in range(0,int(random.uniform(1,6))):
             data = get_events(datetime.now()-timedelta(days=j))
             for event in json.loads(data):
                 response = requests.post('http://localhost:8290/json?p={party}'.format(party=party), json=event)
-                print('POST status %d' % response.status_code)
+                # print('POST status %d' % response.status_code)
                 responses.update([response.status_code])
 
     print('\nSummary:')

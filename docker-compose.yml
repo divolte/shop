@@ -84,6 +84,9 @@ services:
       DIVOLTE_HDFS_SINK_ROLL_DURATION: 15 minutes
     ports:
       - 8290:8290
+    volumes:
+      - ${PWD}/data/generate/mount-data/finished:/tmp/finished
+      - ${PWD}/data/generate/mount-data/processing:/tmp/processing
     depends_on:
       - kafka
     links:
