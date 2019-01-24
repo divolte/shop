@@ -8,8 +8,10 @@ object SparkEventsPerMinute extends SparkJob {
 
   def runQuery(df: DataFrame): DataFrame = {
 
-    df.select(col("eventType"),
-              (col("timestamp") / 1000).cast(TimestampType).alias("ts"))
+    df.select(
+        col("eventType"),
+        (col("timestamp") / 1000).cast(TimestampType).alias("ts")
+      )
       .withWatermark("ts", "2 minutes")
       .groupBy(window(col("ts"), "1 minute"), col("eventType"))
       .count()

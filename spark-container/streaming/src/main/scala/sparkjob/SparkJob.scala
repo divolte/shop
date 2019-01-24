@@ -10,7 +10,7 @@ import org.apache.spark.sql.types._
 import scala.collection.JavaConverters._
 import scopt.OptionParser
 
-case class Config(broker: String = "lcoalhost:9092",
+case class Config(broker: String = "localhost:9092",
                   topic: String = "divolte",
                   group: String = "divolte_spark_streaming")
 
@@ -18,12 +18,15 @@ case class Config(broker: String = "lcoalhost:9092",
 trait SparkJob extends Serializable {
 
   val decoder = AvroDecoder(getAvroSchema)
-  def convertSchemaToStructType(schema: Schema): StructType = {
+  def avroSchemaToSparkSchema(schema: Schema): StructType = {
     val schemaFields = schema.getFields.asScala
       .map(
         field =>
-          StructField(field.name(),
-                      SchemaConverters.toSqlType(field.schema()).dataType))
+          StructField(
+            field.name(),
+            SchemaConverters.toSqlType(field.schema()).dataType
+        )
+      )
     StructType(schemaFields)
   }
 
@@ -42,7 +45,7 @@ trait SparkJob extends Serializable {
 
     val spark = SparkSession.builder().appName("Spark-ETL").getOrCreate()
 
-    val jsonSchema = convertSchemaToStructType(decoder.schema)
+    val jsonSchema = avroSchemaToSparkSchema(decoder.schema)
 
     val kafkaStream =
       spark.readStream.format("kafka").options(kafkaParams).load()
@@ -52,7 +55,7 @@ trait SparkJob extends Serializable {
       .select(from_json(col("record"), jsonSchema).alias("json"))
       .select(col("json.*"))
 
-    val query = runQuery(parsedStream)
+    val query  = runQuery(parsedStream)
     val stream = writeStreamToOutput(query, "console").start()
 
     stream.awaitTermination()
@@ -73,9 +76,9 @@ trait SparkJob extends Serializable {
       case Some(config) =>
         val kafkaParams = Map[String, String](
           "kafka.bootstrap.servers" -> config.broker,
-          "group.id" -> config.group,
-          "auto.offset.reset" -> "latest",
-          "subscribe" -> config.topic
+          "group.id"                -> config.group,
+          "auto.offset.reset"       -> "latest",
+          "subscribe"               -> config.topic
         )
         run(kafkaParams)
       case None =>
