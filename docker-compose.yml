@@ -1,63 +1,63 @@
 version: "3.3"
 services:
   # redis container
-  divolte-redis:
+  toppick-redis:
     image: redis:alpine
-    container_name: divolte-redis
-    hostname: divolte-redis
+    container_name: toppick-redis
+    hostname: toppick-redis
     domainname: divolte_divolte.io
     ports:
       - 6379:6379 # redis server
     networks:
       - divolte.io
   # elastic container
-  divolte-elastic:
+  elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
-    container_name: divolte-elastic
-    hostname: divolte-elastic
+    container_name: elastic
+    hostname: elastic
     domainname: divolte_divolte.io
     environment:
       - cluster.name=elasticsearch
       - discovery.type=single-node
       - xpack.security.enabled=false
       - network.bind_host=0.0.0.0
-      - network.publish_host=divolte-elastic
+      - network.publish_host=elastic
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - 9200:9200
       - 9300:9300
     networks:
       - divolte.io
-  # elastic container
-  divolte-kibana:
+  # kibana container
+  kibana:
     image: docker.elastic.co/kibana/kibana:6.4.0
-    container_name: divolte-kibana
-    hostname: divolte-kibana
+    container_name: kibana
+    hostname: kibana
     domainname: divolte_divolte.io
     environment:
       SERVER_NAME: kibana.divolte_divolte.io
-      ELASTICSEARCH_URL: http://divolte-elastic:9200
+      ELASTICSEARCH_URL: http://elastic:9200
       LOGGING_QUIET: "true"
     ports:
       - 5601:5601
     depends_on:
-      - divolte-elastic
+      - elastic
     links:
-      - divolte-elastic:divolte-elastic
+      - elastic:elastic
     networks:
       - divolte.io
   # Kafka/Zookeeper container
-  divolte-kafka:
+  kafka:
     image: krisgeus/docker-kafka
-    container_name: divolte-kafka
-    hostname: divolte-kafka
+    container_name: kafka
+    hostname: kafka
     domainname: divolte_divolte.io
     environment:
-      ADVERTISED_HOST: divolte-kafka
+      ADVERTISED_HOST: kafka
       LOG_RETENTION_HOURS: 1
       AUTO_CREATE_TOPICS: "false"
       KAFKA_CREATE_TOPICS: divolte:4:1
-      ADVERTISED_LISTENERS: PLAINTEXT://divolte-kafka:9092,INTERNAL://localhost:9093
+      ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,INTERNAL://localhost:9093
       LISTENERS: PLAINTEXT://0.0.0.0:9092,INTERNAL://0.0.0.0:9093
       SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
       INTER_BROKER: INTERNAL
@@ -66,112 +66,132 @@ services:
       - 2181:2181 # Zookeeper
     networks:
       - divolte.io
-  # Divolte container
-  docker-divolte:
+  # divolte clickstream collector
+  clickstream-collector:
     build:
       context: ./divolte
-    container_name: docker-divolte
-    hostname: docker-divolte
+    container_name: clickstream-collector
+    hostname: clickstream-collector
     domainname: divolte_divolte.io
     environment:
-      DIVOLTE_KAFKA_BROKER_LIST: divolte-kafka:9092
+      DIVOLTE_KAFKA_BROKER_LIST: kafka:9092
       DIVOLTE_CONF_DIR: /etc/shop/divolte
     ports:
       - 8290:8290
     depends_on:
-      - divolte-kafka
+      - kafka
     links:
-      - divolte-kafka:divolte-kafka
+      - kafka:kafka
     networks:
       - divolte.io
-  # Divolte shop service
-  docker-shop-service:
+  # divolte shop API for communication with Elastic
+  shop-api:
     build:
       context: ./service
-    container_name: docker-shop-service
-    hostname: docker-shop-service
+    container_name: shop-api
+    hostname: shop-api
     domainname: divolte_divolte.io
     environment:
-      ELASTICSEARCH_HOSTS: "[\"divolte-elastic\"]"
+      ELASTICSEARCH_HOSTS: "[\"elastic\"]"
       ELASTICSEARCH_CLUSTER_NAME: elasticsearch
       JAVA_OPTS: "-Xms512m -Xmx512m"
     ports:
       - 8080:8080
       - 8081:8081
     depends_on:
-      - docker-divolte
-      - divolte-elastic
+      - clickstream-collector
+      - elastic
     links:
-      - docker-divolte:docker-divolte
-      - divolte-elastic:divolte-elastic
+      - clickstream-collector:clickstream-collector
+      - elastic:elastic
     networks:
       - divolte.io
   # Divolte shop top-pick consumer
-  docker-toppick-consumer:
+  toppick-consumer:
     build:
       context: ./top-pick-service
       dockerfile: Dockerfile.consumer
-    container_name: docker-toppick-consumer
-    hostname: docker-toppick-consumer
+    container_name: toppick-consumer
+    hostname: toppick-consumer
     domainname: divolte_divolte.io
     environment:
-      REDIS_HOST_PORT: "divolte-redis:6379"
-      KAFKA_BROKERS: "divolte-kafka:9092"
+      REDIS_HOST_PORT: "toppick-redis:6379"
+      KAFKA_BROKERS: "kafka:9092"
       KAFKA_TOPIC: divolte
-      ELASTIC_HOST_PORT: "divolte-elastic:9200"
+      ELASTIC_HOST_PORT: "elastic:9200"
     depends_on:
-      - divolte-redis
-      - divolte-kafka
-      - divolte-elastic
+      - toppick-redis
+      - kafka
+      - elastic
     links:
-      - divolte-redis:divolte-redis
-      - divolte-kafka:divolte-kafka
-      - divolte-elastic:divolte-elastic
+      - toppick-redis:toppick-redis
+      - kafka:kafka
+      - elastic:elastic
     networks:
       - divolte.io
   # Divolte shop top-pick bandit
-  docker-toppick-bandit:
+  toppick-bandit:
     build:
       context: ./top-pick-service
       dockerfile: Dockerfile.bandit
-    container_name: docker-toppick-bandit
-    hostname: docker-toppick-bandit
+    container_name: toppick-bandit
+    hostname: toppick-bandit
     domainname: divolte_divolte.io
     environment:
-      REDIS_HOST_PORT: "divolte-redis:6379"
+      REDIS_HOST_PORT: "toppick-redis:6379"
       BIND_PORT: 8989
       BIND_HOST: 0.0.0.0
     ports:
       - 8989:8989
     depends_on:
-      - divolte-redis
+      - toppick-redis
     links:
-      - divolte-redis:divolte-redis
+      - toppick-redis:toppick-redis
     networks:
       - divolte.io
-  # Divolte shop webapp
-  docker-shop-webapp:
+  # container serving the webshop
+  shop-webapp:
     build:
       context: ./webapp
-    container_name: docker-shop-webapp
-    hostname: docker-shop-webapp
+    container_name: shop-webapp
+    hostname: shop-webapp
     domainname: divolte_divolte.io
     environment:
-      SHOP_API_URL: "http://docker-shop-service:8080/api"
-      SHOP_BANDIT_URL: "http://docker-toppick-bandit:8989/item"
+      SHOP_API_URL: "http://shop-api:8080/api"
+      SHOP_BANDIT_URL: "http://toppick-bandit:8989/item"
       SHOP_DIVOLTE_URL: "//localhost:8290/divolte.js"
       SHOP_WEBAPP_SECRET: "foo"
       SHOP_WEBAPP_PORT: 9011
     ports:
       - 9011:9011
     depends_on:
-      - docker-divolte
-      - docker-toppick-bandit
-      - docker-shop-service
+      - clickstream-collector
+      - toppick-bandit
+      - shop-api
     links:
-      - docker-divolte:docker-divolte
-      - docker-toppick-bandit:docker-toppick-bandit
-      - docker-shop-service:docker-shop-service
+      - clickstream-collector:clickstream-collector
+      - toppick-bandit:toppick-bandit
+      - shop-api:shop-api
+    networks:
+      - divolte.io
+  # spark container analyzing the clickstream
+  clickstream-analyzer:
+    build:
+      context: ./spark-container
+    container_name: clickstream-analyzer
+    hostname: clickstream-analyzer
+    environment:
+      KAFKA_BROKERS: "kafka:9092"
+      KAFKA_TOPIC: "divolte"
+      SPARK_JOB_CLASS: "sparkjob.SparkEventsPerMinute"
+    ports:
+      - 7077:7077 # spark master
+      - 4040:4040 # spark web UI
+      - 18080:18080 # history server
+    depends_on:
+      - kafka
+    links:
+      - kafka:kafka
     networks:
       - divolte.io
   # divolte-druid:
@@ -185,12 +205,11 @@ services:
   #   ports:
   #     - 8981:8081
   #   depends_on:
-  #     - divolte-kafka
+  #     - kafka
   #   links:
-  #     - divolte-kafka:divolte-kafka
+  #     - kafka:kafka
   #   networks:
   #     - divolte.io
-
 networks:
   divolte.io:
     driver: bridge
