@@ -15,8 +15,7 @@ class SparkEventsPerMinuteTest
 
   override implicit def reuseContextIfPossible: Boolean = true
 
-  ignore("Testing window function ") {
-    // TODO: fix the test, need to be checked how wondow function with watermarks works
+  test("Testing window function ") {
 
     import spark.implicits._
     val input = Seq(Seq(Input("preview", 1538143025000L)),
