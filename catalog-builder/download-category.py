@@ -80,6 +80,10 @@ def with_info(photos, session):
                 dot_field(info, 'tags.tag')) == list else [dot_field(info, 'tags.tag.#text')]
         }
 
+        # Change [None] values to empty list, [None] values will result in 500 error codes is send to the shop-api
+        if photo['info']['tags'][0] is None:
+            photo['info']['tags'] = []
+
         yield photo
 
 
