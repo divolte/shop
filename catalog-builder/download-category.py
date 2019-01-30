@@ -77,7 +77,7 @@ def with_info(photos, session):
             'title': dot_field(info, 'title'),
             'description': dot_field(info, 'description'),
             'tags': [dot_field(tag, '#text') for tag in dot_field(info, 'tags.tag') or []] if type(
-                dot_field(info, 'tags.tag')) == list else dot_field(info, 'tags.tag.#text')
+                dot_field(info, 'tags.tag')) == list else [dot_field(info, 'tags.tag.#text')]
         }
 
         yield photo
