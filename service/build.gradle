@@ -33,6 +33,7 @@ dependencies {
     compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: '6.4.0'
     compile group: 'com.google.guava', name: 'guava', version: '24.0-jre'
     compile group: 'io.dropwizard', name: 'dropwizard-core', version: '1.2.3'
+    compile group: 'io.dropwizard', name: 'dropwizard-testing', version: '1.2.3'
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
     compile group: 'com.github.cage', name: 'cage', version: '1.0'
     compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.4.2.Final'
