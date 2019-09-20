@@ -78,6 +78,8 @@ def main(args):
     for item in items.values():
         r = requests.put(args.api_base_url + '/catalog/item', data=json.dumps(item), headers={'Content-Type': 'application/json'})
         print('PUT %s, %d' % (item['id'], r.status_code))
+        if r.status_code != 200:
+            print(json.dumps(item))
         responses.update([r.status_code])
 
     print('\nSummary:')

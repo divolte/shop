@@ -76,15 +76,36 @@ through [localhost:9011](http://localhost:9011/).
 service/gradlew -p service build && (cd spark-container/streaming && sbt assembly) && docker-compose up -d --build
 ```
 
+#### Download new products
+
+Optionally you can download new image-data from flickr.
+
+> Note: you need to fill in your own FLick Api key, and wait a very long time...!
+
+```bash
+export FLICKR_API_KEY=''
+
+docker run --rm -it \
+  --volume $PWD:/divolte-shop \
+  --workdir /divolte-shop \
+  --network host \
+  python:3.6 \
+  bash -c "pip install -r catalog-builder/requirements.txt \
+    && python catalog-builder/download-category.py \
+        --searches catalog-builder/categories.yml \
+        --max-images 100 \
+        --key ${FLICKR_API_KEY}"
+```
+
 #### Loading products
 The first time you start the docker composition, you have to load the product catalog, like this:
 
 ```text
-docker run -it --volume $PWD:/divolte-shop \
+docker run -it --rm --volume $PWD:/divolte-shop \
   --workdir /divolte-shop \
   --network host \
   python:3.6 \
-  bash -c 'pip install requests && python catalog-builder/put-catagories.py \
+  bash -c 'pip install requests && python catalog-builder/put-categories.py \
                             data/categories/animals.json \
                             data/categories/architecture.json \
                             data/categories/cars.json \

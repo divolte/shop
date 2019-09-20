@@ -1,0 +1,35 @@
+categories:
+  - flowers:
+      keywords:
+        - flowers
+        - flower
+        - plants
+        - garden
+  - animals:
+      keywords:
+        - animals
+        - wildlife
+        - animal
+  - architecture:
+      keywords:
+        - building
+        - architecture
+        - church
+  - cars:
+      keywords:
+        - cars
+        - auto
+  - cities:
+      keywords:
+        - cities
+        - city
+        - amsterdam
+  - landscape:
+      keywords:
+        - landscape
+        - mountain
+  - nautical:
+      keywords:
+        - nautical
+        - marine
+        - harbour
