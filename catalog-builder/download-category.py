@@ -6,6 +6,8 @@ import yaml
 from requests.adapters import HTTPAdapter
 from functools import reduce
 from itertools import islice, chain
+import os
+from xml.parsers.expat import ExpatError
 
 
 def dot_field(input_dict, input_key):
@@ -13,7 +15,6 @@ def dot_field(input_dict, input_key):
 
 
 def search_result(query, session, pages):
-    result = []
     for page in range(pages):
         params = {
             'api_key': API_KEY,
@@ -46,8 +47,13 @@ def filter_unfavorable(photos, session, threshold):
             'photo_id': photo_id
         }
         response = session.get('https://api.flickr.com/services/rest/', params=params)
-        response_xml = xmltodict.parse(response.text)
-        return len(dot_field(response_xml, 'rsp.photo.person') or [])
+        try:
+            response_xml = xmltodict.parse(response.text)
+            return len(dot_field(response_xml, 'rsp.photo.person') or [])
+        except ExpatError:
+            # We have seen some weird xml error:
+            # xml.parsers.expat.ExpatError: not well-formed (invalid token): line 20, column 81
+            return 0
 
     for photo in photos:
         count = fav_count(photo['id'])
@@ -116,7 +122,7 @@ def main(args):
     session.mount('https://api.flickr.com/', HTTPAdapter(max_retries=10))
 
     with open(args.searches, 'r') as stream:
-        config = yaml.load(stream)
+        config = yaml.safe_load(stream)
         for category in config['categories']:
             for (category_name, category_config) in category.items():
                 print(category_config['keywords'])
@@ -127,21 +133,21 @@ def main(args):
                 info_photos = with_info(capped_photos, session)
                 photos = with_sizes(info_photos, session)
 
-                count = 0
-                with open('../data/categories/%s.json' % category_name, 'w', encoding='utf-8') as output_file:
-                    for photo in photos:
+                destination_file = os.path.join(args.dest, '%s.json' % category_name)
+
+                with open(destination_file, 'w', encoding='utf-8') as output_file:
+                    for idx, photo in enumerate(photos):
                         output_file.write(json.dumps(photo))
                         output_file.write('\n')
-                        count += 1
-                    output_file.close()
 
-                print('Written %d photos.' % count)
+                print('Written %d photos for category %s.' % (idx+1, category_name))
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Create a JSON description of a set of images retrieved from the Flickr API based on keyword searches.')
     parser.add_argument('--key', '-k', metavar='API_KEY', type=str, required=True, help='The Flickr API key to use.')
+    parser.add_argument('--dest', '-d', metavar='DEST', type=str, help='The output directory to store the jsons', default="data/categories")
     parser.add_argument('--searches', '-s', metavar='SEARCH_KEYWORD', type=str, required=True, default='categories.yml',
                         help='Yaml file containing the categories and keywords to search for.')
     parser.add_argument('--fav-threshold', '-t', metavar='FAVOURITES_THRESHOLD', type=int, default=30,
