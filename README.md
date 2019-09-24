@@ -41,6 +41,25 @@ This application comprises a number of different processes:
                      +
 ```
 
+## Prerequisites
+
+The following packages are required;
+	- `wget`;
+	- `sbt`;
+	- and `scala`. 
+
+Install them with your package manager:
+
+```
+brew update
+brew install wget sbt scala
+```
+
+```
+apt update
+apt install wget sbt scala       # might need to add a repository for scala
+```
+
 ## Running with Docker
 
 The easiest way to get started is with Docker Compose.
