@@ -30,7 +30,8 @@ ENV SPARK_APP_VERSION=0.0.1-SNAPSHOT
 ENV SPARK_JOB_CLASS=${SPARK_JOB_CLASS:-sparkjob.SparkEventsPerMinute}
 
 ENV MINICONDA_DIR /opt/miniconda
-ENV MINICONDA_CHECKSUM=e5e5b4cd2a918e0e96b395534222773f7241dc59d776db1b9f7fedfcb489157a
+ENV MINICONDA_VERSION=4.7.10
+ENV MINICONDA_CHECKSUM=8a324adcc9eaf1c09e22a992bb6234d91a94146840ee6b11c114ecadafc68121
 
 ENV PATH=$MINICONDA_DIR/bin/:$SPARK_HOME/bin/:$PATH
 
@@ -49,7 +50,7 @@ RUN mkdir -p $SPARK_HOME/work/ \
   && cat $SPARK_HOME/conf/log4j.properties.template | sed -e "s/INFO/WARN/g" > $SPARK_HOME/conf/log4j.properties
 
 # Miniconda
-RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh \
+RUN wget https://repo.continuum.io/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O miniconda.sh \
     && echo "$MINICONDA_CHECKSUM miniconda.sh" | sha256sum -c - \
     && chmod a+x miniconda.sh \
     && ./miniconda.sh -b -p $MINICONDA_DIR \
