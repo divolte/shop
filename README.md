@@ -41,6 +41,23 @@ This application comprises a number of different processes:
                      +
 ```
 
+## Prerequisite(s)
+
+The following package(s) are required;
+	- `sbt`.
+
+Install them with your package manager:
+
+```
+brew update
+brew install sbt
+```
+
+```
+apt update
+apt install sbt 
+```
+
 ## Running with Docker
 
 The easiest way to get started is with Docker Compose.
