@@ -18,12 +18,12 @@ This application comprises a number of different processes:
 
 ```text
                      +
-                     |      +-----------+        +------------+         +-----------------+         +---------------+
-                     |      |           |        |            |         |                 |         |               |
-                     |   +-->  Webshop  +-------->  Service   |         |   Elasticsearch |         |    Kibana     |
-                     |      |  :9011    |        |  :8080     +--------->   :9200         +--------->    :5601      |
-                     |   |  |           +---+    |  :8081     |         |   :9300         |         +---------------+
-                     |   |  +-----------+   |    +------------+         +-----------------+
+                     |      +-----------+        +------------+         +-----------------+         +-------------+
+                     |      |           |        |            |         |                 |         |             |
+                     |   +-->  Webshop  +-------->  Service   |         |  Elasticsearch  |         |  Kibana     |
+                     |   |  |  :9011    +---+    |  :8080     +--------->  :9200          +--------->  :5601      |
+                     |   |  +-----------+   |    |  :8081     |         |  :9300          |         +-------------+
+                     |   |                  |    +------------+         +-----------------+
                      |   |                  |
 +---------------+    |   |                  |    +--------------------+       +---------+
 |               |    |   |                  |    |                    |       |         |
@@ -34,10 +34,10 @@ This application comprises a number of different processes:
                      |   |                              |
                      |   |  +-----------+        +------+------+        +-----------+
                      |   |  |           |        |             |        |           |
-                     |   +-->  Divolte  +-------->  Kafka      +--------> Spark     |
-                     |      |  :8290    |        |  :9092      |        | :7077     |
-                     |      |           |        |  :2181      |        | :4040     |
-                     |      +-----------+        +-------------+        +-----------+
+                     |   +-->  Divolte  +-------->  Kafka      +-------->  Spark    |
+                     |      |  :8290    |        |  :9092      |        |  :7077    |
+                     |      +-----------+        |  :2181      |        |  :4040    |
+                     |                           +-------------+        +-----------+
                      +
 ```
 
@@ -97,7 +97,7 @@ service/gradlew -p service build && (cd spark-container/streaming && sbt assembl
 
 Optionally you can download new image-data from flickr.
 
-> Note: you need to fill in your own FLick Api key, and wait a very long time...!
+> Note: you need to fill in your own Flickr Api key, and wait a very long time...!
 
 ```bash
 export FLICKR_API_KEY=''
