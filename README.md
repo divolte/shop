@@ -45,19 +45,18 @@ This application comprises a number of different processes:
 
 The following packages are required;
 	- `wget`;
-	- `sbt`;
-	- and `scala`. 
+	- and `sbt`.
 
 Install them with your package manager:
 
 ```
 brew update
-brew install wget sbt scala
+brew install wget sbt
 ```
 
 ```
 apt update
-apt install wget sbt scala       # might need to add a repository for scala
+apt install wget sbt 
 ```
 
 ## Running with Docker
