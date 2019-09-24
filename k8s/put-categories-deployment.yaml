@@ -12,7 +12,14 @@ spec:
           volumeMounts:
             - mountPath: /shop
               name: divolte-shop
-          command: ["ls"]
+          command: ["bash -c 'pip install requests && python catalog-builder/put-categories.py \
+                                                 data/categories/animals.json \
+                                                 data/categories/architecture.json \
+                                                 data/categories/cars.json \
+                                                 data/categories/cities.json \
+                                                 data/categories/flowers.json \
+                                                 data/categories/landscape.json \
+                                                 data/categories/nautical.json'"]
       restartPolicy: Never
       volumes:
         - name: divolte-shop
