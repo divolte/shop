@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.18.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: toppick-redis
+  name: toppick-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toppick-redis
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: toppick-redis
+    spec:
+      containers:
+      - image: redis:alpine
+        name: toppick-redis
+        ports:
+        - containerPort: 6379
+        resources: {}
+      hostname: toppick-redis
+      restartPolicy: Always
+      subdomain: divolte-divolte
+status: {}

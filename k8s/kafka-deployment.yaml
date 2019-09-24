@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.18.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kafka
+  name: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+      - env:
+        - name: ADVERTISED_HOST
+          value: kafka
+        - name: ADVERTISED_LISTENERS
+          value: PLAINTEXT://kafka:9092,INTERNAL://localhost:9093
+        - name: AUTO_CREATE_TOPICS
+          value: "false"
+        - name: INTER_BROKER
+          value: INTERNAL
+        - name: KAFKA_CREATE_TOPICS
+          value: divolte:4:1
+        - name: LISTENERS
+          value: PLAINTEXT://0.0.0.0:9092,INTERNAL://0.0.0.0:9093
+        - name: LOG_RETENTION_HOURS
+          value: "1"
+        - name: SECURITY_PROTOCOL_MAP
+          value: PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
+        image: krisgeus/docker-kafka
+        name: kafka
+        ports:
+        - containerPort: 9092
+        - containerPort: 2181
+        resources: {}
+      hostname: kafka
+      restartPolicy: Always
+      subdomain: divolte-divolte
+status: {}

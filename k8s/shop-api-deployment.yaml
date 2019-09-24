@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.18.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: shop-api
+  name: shop-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop-api
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: shop-api
+    spec:
+      containers:
+      - env:
+        - name: ELASTICSEARCH_CLUSTER_NAME
+          value: elasticsearch
+        - name: ELASTICSEARCH_HOSTS
+          value: '["elastic"]'
+        - name: JAVA_OPTS
+          value: -Xms512m -Xmx512m
+        image: shop_shop-api
+        name: shop-api
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        resources: {}
+      hostname: shop-api
+      restartPolicy: Always
+      subdomain: divolte-divolte
+status: {}
