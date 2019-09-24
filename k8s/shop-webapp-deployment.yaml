@@ -6,7 +6,7 @@ metadata:
     kompose.version: 1.18.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: shop-webapp
+    app: shop-webapp
   name: shop-webapp
 spec:
   replicas: 1

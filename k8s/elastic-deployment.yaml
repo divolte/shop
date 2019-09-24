@@ -6,7 +6,7 @@ metadata:
     kompose.version: 1.18.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: elastic
+    app: elastic
   name: elastic
 spec:
   replicas: 1

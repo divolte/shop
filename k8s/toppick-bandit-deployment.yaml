@@ -6,7 +6,7 @@ metadata:
     kompose.version: 1.18.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: toppick-bandit
+    app: toppick-bandit
   name: toppick-bandit
 spec:
   replicas: 1
