@@ -44,19 +44,18 @@ This application comprises a number of different processes:
 ## Prerequisites
 
 The following packages are required;
-	- `wget`;
-	- and `sbt`.
+	- `sbt`.
 
 Install them with your package manager:
 
 ```
 brew update
-brew install wget sbt
+brew install sbt
 ```
 
 ```
 apt update
-apt install wget sbt 
+apt install sbt 
 ```
 
 ## Running with Docker
