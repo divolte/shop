@@ -12,14 +12,8 @@ spec:
           volumeMounts:
             - mountPath: /shop
               name: divolte-shop
-          command: ["bash -c 'pip install requests && python catalog-builder/put-categories.py \
-                                                 data/categories/animals.json \
-                                                 data/categories/architecture.json \
-                                                 data/categories/cars.json \
-                                                 data/categories/cities.json \
-                                                 data/categories/flowers.json \
-                                                 data/categories/landscape.json \
-                                                 data/categories/nautical.json'"]
+          command: ["bash"]
+          args: ["-c", "pip install requests && python catalog-builder/put-categories.py --api-base-url http://shop-api:8080/api data/categories/animals.json data/categories/architecture.json data/categories/cars.json data/categories/cities.json data/categories/flowers.json data/categories/landscape.json data/categories/nautical.json"]
       restartPolicy: Never
       volumes:
         - name: divolte-shop
