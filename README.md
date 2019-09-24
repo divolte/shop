@@ -85,7 +85,7 @@ We will use these public containers:
 ### Running with docker compose
 
 When you have the containers up and running you can access the webshop 
-through [localhost:9011](http://localhost:9011/). 
+through [localhost:9011](http://localhost:9011/){:target="_blank"}. 
 
 > These ports should be available: 9011, 8080, 8081, 9200, 9300, 8290, 9092, 2181, 6379, 8989
 
@@ -131,4 +131,4 @@ docker run -it --rm --volume $PWD:/divolte-shop \
                             data/categories/landscape.json \
                             data/categories/nautical.json'
 ```
-Go to [localhost:9011](http://localhost:9011/).
+Go to [localhost:9011](http://localhost:9011/){:target="_blank"}.
