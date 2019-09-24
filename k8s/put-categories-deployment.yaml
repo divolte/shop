@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: put-categories
+spec:
+  template:
+    spec:
+      containers:
+        - name: put-categories
+          image: python:3.6
+          workingDir: /shop
+          volumeMounts:
+            - mountPath: /shop
+              name: divolte-shop
+          command: ["ls"]
+      restartPolicy: Never
+      volumes:
+        - name: divolte-shop
+          hostPath:
+            # directory location on host
+            path: /Users/bas/code/gdd/shop
+            # this field is optional
+            type: Directory
+  backoffLimit: 4
