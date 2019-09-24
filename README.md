@@ -41,9 +41,9 @@ This application comprises a number of different processes:
                      +
 ```
 
-## Prerequisites
+## Prerequisite(s)
 
-The following packages are required;
+The following package(s) are required;
 	- `sbt`.
 
 Install them with your package manager:
