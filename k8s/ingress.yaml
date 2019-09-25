@@ -8,7 +8,7 @@ spec:
     rules:
       - http:
           paths:
-            - path: /shop
+            - path: /
               backend:
                 serviceName: shop-webapp
                 servicePort: 9011
