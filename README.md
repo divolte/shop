@@ -44,9 +44,11 @@ This application comprises a number of different processes:
 ## Prerequisite(s)
 
 The following package(s) are required;
-	- `sbt`.
 
-Install them with your package manager:
+	- `sbt`;
+    - and `ingress-nginx`.
+
+Install with your package manager:
 
 ```
 brew update
@@ -57,6 +59,32 @@ brew install sbt
 apt update
 apt install sbt 
 ```
+
+### Ingress Nginx
+
+Our setup uses an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) with Nginx to define reroutes to the webshop and the
+API (aka service) used by the webshop. The following steps 
+are required:
+
+For all deployments:
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+```
+
+Provider specific:
+
+**For Docker for mac**
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
+```
+
+**For minikube**
+```
+minikube addons enable ingress
+```
+
+For more info, see [here](https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/index.md#installation-guide).
 
 ## Running with Docker
 
