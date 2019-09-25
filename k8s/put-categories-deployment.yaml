@@ -20,4 +20,8 @@ spec:
           hostPath:
             path: /Users/bas/code/gdd/shop
             type: Directory
+      initContainers:
+        - name: wait-for-shop-api
+          image: busybox:1.28
+          command: ['sh', '-c', 'sleep 30']
   backoffLimit: 4
