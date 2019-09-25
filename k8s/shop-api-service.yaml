@@ -14,5 +14,3 @@ spec:
     targetPort: 8081
   selector:
     app: shop-api
-  type: LoadBalancer
-
