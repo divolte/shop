@@ -11,4 +11,3 @@ spec:
     targetPort: 9011
   selector:
     app: shop-webapp
-  type: LoadBalancer
