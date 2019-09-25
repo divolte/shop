@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: nginx-ingress
+    annotations:
+      ingress.kubernetes.io/rewrite-target: /
+spec:
+    rules:
+      - http:
+          paths:
+            - path: /
+              backend:
+                serviceName: shop-webapp
+                servicePort: 9011
+            - path: /api
+              backend:
+                serviceName: shop-api
+                servicePort: 8080
