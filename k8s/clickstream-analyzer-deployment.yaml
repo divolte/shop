@@ -1,19 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: clickstream-analyzer
   labels:
     app: clickstream-analyzer
-  name: clickstream-analyzer
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: clickstream-analyzer
-  strategy: {}
   template:
     metadata:
       labels:
@@ -29,12 +24,10 @@ spec:
           value: sparkjob.SparkEventsPerMinute
         image: shop_clickstream-analyzer
         name: clickstream-analyzer
-        imagePullPolicy: Never
+        imagePullPolicy: Never # always local
         ports:
         - containerPort: 7077
         - containerPort: 4040
         - containerPort: 18080
-        resources: {}
       hostname: clickstream-analyzer
       restartPolicy: Always
-status: {}

@@ -1,19 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: toppick-bandit
   labels:
     app: toppick-bandit
-  name: toppick-bandit
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: toppick-bandit
-  strategy: {}
   template:
     metadata:
       labels:
@@ -32,8 +27,6 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 8989
-        resources: {}
       hostname: toppick-bandit
       restartPolicy: Always
       subdomain: divolte-divolte
-status: {}

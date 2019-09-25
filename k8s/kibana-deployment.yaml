@@ -1,19 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: kibana
   labels:
     app: kibana
-  name: kibana
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: kibana
-  strategy: {}
   template:
     metadata:
       labels:
@@ -31,8 +26,6 @@ spec:
         name: kibana
         ports:
         - containerPort: 5601
-        resources: {}
       hostname: kibana
       restartPolicy: Always
       subdomain: divolte-divolte
-status: {}

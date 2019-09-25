@@ -1,13 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: clickstream-collector
   labels:
     app: clickstream-collector
-  name: clickstream-collector
 spec:
   ports:
   - name: "8290"
@@ -15,5 +11,3 @@ spec:
     targetPort: 8290
   selector:
     app: clickstream-collector
-status:
-  loadBalancer: {}

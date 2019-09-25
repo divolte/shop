@@ -1,19 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: elastic
   labels:
     app: elastic
-  name: elastic
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: elastic
-  strategy: {}
   template:
     metadata:
       labels:
@@ -38,8 +33,6 @@ spec:
         ports:
         - containerPort: 9200
         - containerPort: 9300
-        resources: {}
       hostname: elastic
       restartPolicy: Always
       subdomain: divolte-divolte
-status: {}

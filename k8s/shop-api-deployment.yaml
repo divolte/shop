@@ -1,19 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: shop-api
   labels:
     app: shop-api
-  name: shop-api
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: shop-api
-  strategy: {}
   template:
     metadata:
       labels:
@@ -33,8 +28,6 @@ spec:
         ports:
         - containerPort: 8080
         - containerPort: 8081
-        resources: {}
       hostname: shop-api
       restartPolicy: Always
       subdomain: divolte-divolte
-status: {}

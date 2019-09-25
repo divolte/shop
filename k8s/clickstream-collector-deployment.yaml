@@ -1,19 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: clickstream-collector
   labels:
     app: clickstream-collector
-  name: clickstream-collector
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: clickstream-collector
-  strategy: {}
   template:
     metadata:
       labels:
@@ -30,8 +25,6 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 8290
-        resources: {}
       hostname: clickstream-collector
       restartPolicy: Always
       subdomain: divolte-divolte
-status: {}

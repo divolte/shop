@@ -1,13 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: shop-webapp
   labels:
     app: shop-webapp
-  name: shop-webapp
 spec:
   ports:
   - name: "9011"
@@ -16,5 +12,3 @@ spec:
   selector:
     app: shop-webapp
   type: LoadBalancer
-status:
-  loadBalancer: {}

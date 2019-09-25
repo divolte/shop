@@ -1,13 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: toppick-redis
   labels:
     app: toppick-redis
-  name: toppick-redis
 spec:
   ports:
   - name: "6379"
@@ -15,5 +11,3 @@ spec:
     targetPort: 6379
   selector:
     app: toppick-redis
-status:
-  loadBalancer: {}

@@ -1,19 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: kafka
   labels:
     app: kafka
-  name: kafka
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: kafka
-  strategy: {}
   template:
     metadata:
       labels:
@@ -42,8 +37,6 @@ spec:
         ports:
         - containerPort: 9092
         - containerPort: 2181
-        resources: {}
       hostname: kafka
       restartPolicy: Always
       subdomain: divolte-divolte
-status: {}

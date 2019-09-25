@@ -1,19 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.18.0 ()
-  creationTimestamp: null
+  name: toppick-consumer
   labels:
     app: toppick-consumer
-  name: toppick-consumer
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: toppick-consumer
-  strategy: {}
   template:
     metadata:
       labels:
@@ -32,8 +27,6 @@ spec:
         image: shop_toppick-consumer
         name: toppick-consumer
         imagePullPolicy: Never
-        resources: {}
       hostname: toppick-consumer
       restartPolicy: Always
       subdomain: divolte-divolte
-status: {}
