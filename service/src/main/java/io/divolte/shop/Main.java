@@ -1,10 +1,6 @@
 package io.divolte.shop;
 
-import io.divolte.shop.catalog.BasketResource;
-import io.divolte.shop.catalog.CatalogCategoryResource;
-import io.divolte.shop.catalog.DataAccess;
-import io.divolte.shop.catalog.CatalogItemResource;
-import io.divolte.shop.catalog.CheckoutResource;
+import io.divolte.shop.catalog.*;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -44,6 +40,7 @@ public class Main extends Application<ServiceConfiguration> {
         environment.jersey().register(new CatalogCategoryResource(client));
         environment.jersey().register(new BasketResource(client));
         environment.jersey().register(new CheckoutResource());
+        environment.jersey().register(new APIStatusResource());
 
         environment.healthChecks().register("ElasticSearch", new ElasticSearchHealthCheck(client));
     }

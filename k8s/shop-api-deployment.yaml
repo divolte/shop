@@ -28,6 +28,12 @@ spec:
         ports:
         - containerPort: 8080
         - containerPort: 8081
+        livenessProbe:
+          httpGet:
+            path: /api/status/ping
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
       hostname: shop-api
       restartPolicy: Always
       subdomain: divolte-divolte
