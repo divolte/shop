@@ -150,7 +150,7 @@ docker run -it --rm --volume $PWD:/divolte-shop \
   --workdir /divolte-shop \
   --network host \
   python:3.6 \
-  bash -c 'pip install requests && python catalog-builder/put-categories.py \
+  bash -c 'pip install requests retrying && python catalog-builder/put-categories.py \
                             data/categories/animals.json \
                             data/categories/architecture.json \
                             data/categories/cars.json \
