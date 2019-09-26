@@ -91,7 +91,7 @@ def main(args):
     for item in items.values():
         r = _requests_put_json(
             args.api_base_url + '/catalog/item',
-            data=json.dump(item)
+            data=json.dumps(item)
         )
         print('PUT %s, %d' % (item['id'], r.status_code))
         if r.status_code != 200:
