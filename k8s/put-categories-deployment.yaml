@@ -9,24 +9,10 @@ spec:
       - env:
         - name: SHOP_API_URL
           value: "http://shop-api:8080/api"
-
         name: put-categories
         image: shop_catalog-builder:latest
         imagePullPolicy: Never
-          #workingDir: /shop
-          #volumeMounts:
-          #  - mountPath: /shop
-          #     name: divolte-shop
-          # command: ["bash"]
-          # args: ["-c", "pip install requests && python catalog-builder/put-categories.py --api-base-url http://shop-api:8080/api data/categories/animals.json data/categories/architecture.json data/categories/cars.json data/categories/cities.json data/categories/flowers.json data/categories/landscape.json data/categories/nautical.json"]
-
       restartPolicy: Never
-
-      # volumes:
-      #   - name: divolte-shop
-      #     hostPath:
-      #       path: /Users/bas/code/gdd/shop
-      #       type: Directory
       initContainers:
         - name: wait-for-shop-api-service
           image: busybox:1.28
