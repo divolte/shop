@@ -194,6 +194,14 @@ services:
       - kafka:kafka
     networks:
       - divolte.io
+
+  catalog-builder:
+    build:
+      context: .
+      dockerfile: ./catalog-builder/Dockerfile
+    container_name: catalog-builder
+
+
   # divolte-druid:
   #   # image: fokkodriesprong/docker-druid
   #   image: shop/divolte-druid
