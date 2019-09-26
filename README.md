@@ -15,6 +15,7 @@ This application comprises a number of different processes:
   - a **kafka** topic
 - A **top-pick-service** that receives data from Kafka and continuously selects popular products, using...
   - a **redis** store to tally all the clicks
+- A **spark** streaming consumer of the events to calculate metrics like: nr of events per type per 2 minutes
 
 ```text
                      +
@@ -92,7 +93,7 @@ The easiest way to get started is with Docker Compose.
 
 Make sure you have Docker running locally. You can download a proper version at the [Docker Store][ds].
 
-We are running 6 containers, and the default size is not large enough. Boost the ram of Docker to at least 4GB,
+We are running a couple of containers, and the default size is not large enough. Boost the ram of Docker to at least 4GB,
 otherwise you will run into startup problems (Exit with code: 137) when running the `docker-compose up` command.
 
 We are going to build these containers locally:
@@ -109,6 +110,20 @@ We will use these public containers:
 
 [ds]:https://store.docker.com/
 
+### Building Project Jars (required)
+
+Build **jars** from the source-code, before you can wrap them into docker containers for:
+- service
+- spark-container
+
+```bash
+# You can use the utility script, build inside a dockers containers:
+bash build-jars.sh
+
+# Or setup the tools (sbt) yourself and run:
+service/gradlew -p service build 
+cd spark-container/streaming && sbt assembly
+```
 
 ### Running with docker compose
 
@@ -118,12 +133,14 @@ through [localhost:9011](http://localhost:9011/).
 > These ports should be available: 9011, 8080, 8081, 9200, 9300, 8290, 9092, 2181, 6379, 8989
 
 ```bash
-service/gradlew -p service build && (cd spark-container/streaming && sbt assembly) && docker-compose up -d --build
+# note: make sure the jar's have been build
+
+docker-compose up -d --build
 ```
 
-#### Download new products
+#### Download new products (optional)
 
-Optionally you can download new image-data from flickr.
+You can download new image-data from flickr. These are stored in `data/categories` folder.
 
 > Note: you need to fill in your own Flickr Api key, and wait a very long time...!
 
@@ -157,6 +174,6 @@ docker run -it --rm --volume $PWD:/divolte-shop \
                             data/categories/cities.json \
                             data/categories/flowers.json \
                             data/categories/landscape.json \
-                            data/categories/nautical.json'
+                            data/categories/nautical.json'  
 ```
 Go to [localhost:9011](http://localhost:9011/).
