@@ -5,6 +5,9 @@ metadata:
 spec:
   template:
     spec:
+      # Cleans job after it has completed only works when 
+      # '--feture-gate="TTLAfterFinished=True"' is set in kubernetes config
+      ttlSecondsAfterFinished: 100
       containers:
         - name: put-categories
           image: python:3.6
