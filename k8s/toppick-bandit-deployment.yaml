@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toppick-bandit
+  labels:
+    app: toppick-bandit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toppick-bandit
+  template:
+    metadata:
+      labels:
+        app: toppick-bandit
+    spec:
+      containers:
+      - env:
+        - name: BIND_HOST
+          value: 0.0.0.0
+        - name: BIND_PORT
+          value: "8989"
+        - name: REDIS_HOST_PORT
+          value: toppick-redis:6379
+        image: shop_toppick-bandit
+        name: toppick-bandit
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8989
+      hostname: toppick-bandit
+      restartPolicy: Always
+      subdomain: divolte-divolte

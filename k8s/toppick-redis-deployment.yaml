@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toppick-redis
+  labels:
+    app: toppick-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toppick-redis
+  template:
+    metadata:
+      labels:
+        app: toppick-redis
+    spec:
+      containers:
+      - image: redis:alpine
+        name: toppick-redis
+        ports:
+        - containerPort: 6379
+      hostname: toppick-redis
+      restartPolicy: Always
+      subdomain: divolte-divolte

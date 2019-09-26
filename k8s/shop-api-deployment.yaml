@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-api
+  labels:
+    app: shop-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop-api
+  template:
+    metadata:
+      labels:
+        app: shop-api
+    spec:
+      containers:
+      - env:
+        - name: ELASTICSEARCH_CLUSTER_NAME
+          value: elasticsearch
+        - name: ELASTICSEARCH_HOSTS
+          value: '["elastic"]'
+        - name: JAVA_OPTS
+          value: -Xms512m -Xmx512m
+        image: shop_shop-api
+        name: shop-api
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        livenessProbe:
+          httpGet:
+            path: /api/status/ping
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+      hostname: shop-api
+      restartPolicy: Always
+      subdomain: divolte-divolte

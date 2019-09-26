@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickstream-collector
+  labels:
+    app: clickstream-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickstream-collector
+  template:
+    metadata:
+      labels:
+        app: clickstream-collector
+    spec:
+      containers:
+      - env:
+        - name: DIVOLTE_CONF_DIR
+          value: /etc/shop/divolte
+        - name: DIVOLTE_KAFKA_BROKER_LIST
+          value: kafka:9092
+        image: shop_clickstream-collector
+        name: clickstream-collector
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8290
+      hostname: clickstream-collector
+      restartPolicy: Always
+      subdomain: divolte-divolte

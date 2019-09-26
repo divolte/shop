@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - env:
+        - name: ELASTICSEARCH_URL
+          value: http://elastic:9200
+        - name: LOGGING_QUIET
+          value: "true"
+        - name: SERVER_NAME
+          value: kibana.divolte-divolte
+        image: docker.elastic.co/kibana/kibana:6.4.0
+        name: kibana
+        ports:
+        - containerPort: 5601
+      hostname: kibana
+      restartPolicy: Always
+      subdomain: divolte-divolte

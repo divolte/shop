@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toppick-consumer
+  labels:
+    app: toppick-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toppick-consumer
+  template:
+    metadata:
+      labels:
+        app: toppick-consumer
+    spec:
+      containers:
+      - env:
+        - name: ELASTIC_HOST_PORT
+          value: elastic:9200
+        - name: KAFKA_BROKERS
+          value: kafka:9092
+        - name: KAFKA_TOPIC
+          value: divolte
+        - name: REDIS_HOST_PORT
+          value: toppick-redis:6379
+        image: shop_toppick-consumer
+        name: toppick-consumer
+        imagePullPolicy: Never
+      hostname: toppick-consumer
+      restartPolicy: Always
+      subdomain: divolte-divolte

@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: put-categories
+spec:
+  template:
+    spec:
+      # Cleans job after it has completed only works when 
+      # '--feature-gate="TTLAfterFinished=True"' is set in kubernetes config
+      ttlSecondsAfterFinished: 100
+      containers:
+      - env:
+        - name: SHOP_API_URL
+          value: "http://shop-api:8080/api"
+        name: put-categories
+        image: shop_catalog-builder:latest
+        imagePullPolicy: Never
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-shop-api-service
+          image: busybox:1.28
+          command: ['sh', '-c', 'until nslookup shop-api; do echo waiting for shop api; sleep 10; done;']
+        - name: wait-for-shop-api-ping
+          image: busybox:1.28
+          command: ['sh', '-c', 'until wget -q --spider "http://shop-api:8080/api/status/ping"; do echo waiting for API ping; sleep 10; done;']
+  backoffLimit: 4

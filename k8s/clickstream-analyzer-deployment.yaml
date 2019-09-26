@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickstream-analyzer
+  labels:
+    app: clickstream-analyzer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickstream-analyzer
+  template:
+    metadata:
+      labels:
+        app: clickstream-analyzer
+    spec:
+      containers:
+      - env:
+        - name: KAFKA_BROKERS
+          value: kafka:9092
+        - name: KAFKA_TOPIC
+          value: divolte
+        - name: SPARK_JOB_CLASS
+          value: sparkjob.SparkEventsPerMinute
+        image: shop_clickstream-analyzer
+        name: clickstream-analyzer
+        imagePullPolicy: Never # always local
+        ports:
+        - containerPort: 7077
+        - containerPort: 4040
+        - containerPort: 18080
+      hostname: clickstream-analyzer
+      restartPolicy: Always

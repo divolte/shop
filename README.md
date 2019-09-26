@@ -15,6 +15,7 @@ This application comprises a number of different processes:
   - a **kafka** topic
 - A **top-pick-service** that receives data from Kafka and continuously selects popular products, using...
   - a **redis** store to tally all the clicks
+- A **spark** streaming consumer of the events to calculate metrics like: nr of events per type per 2 minutes
 
 ```text
                      +
@@ -44,9 +45,11 @@ This application comprises a number of different processes:
 ## Prerequisite(s)
 
 The following package(s) are required;
-	- `sbt`.
 
-Install them with your package manager:
+	- `sbt`;
+    - and `ingress-nginx`.
+
+Install with your package manager:
 
 ```
 brew update
@@ -58,13 +61,39 @@ apt update
 apt install sbt 
 ```
 
+### Ingress Nginx
+
+Our setup uses an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) with Nginx to define reroutes to the webshop and the
+API (aka service) used by the webshop. The following steps 
+are required:
+
+For all deployments:
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+```
+
+Provider specific:
+
+**For Docker for mac**
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
+```
+
+**For minikube**
+```
+minikube addons enable ingress
+```
+
+For more info, see [here](https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/index.md#installation-guide).
+
 ## Running with Docker
 
 The easiest way to get started is with Docker Compose.
 
 Make sure you have Docker running locally. You can download a proper version at the [Docker Store][ds].
 
-We are running 6 containers, and the default size is not large enough. Boost the ram of Docker to at least 4GB,
+We are running a couple of containers, and the default size is not large enough. Boost the ram of Docker to at least 4GB,
 otherwise you will run into startup problems (Exit with code: 137) when running the `docker-compose up` command.
 
 We are going to build these containers locally:
@@ -81,8 +110,22 @@ We will use these public containers:
 
 [ds]:https://store.docker.com/
 
+### Building Project Jars (required)
 
-### Running with docker compose
+Build **jars** from the source-code, before you can wrap them into docker containers for:
+- service
+- spark-container
+
+```bash
+# You can use the utility script, build inside a dockers containers:
+bash build-jars.sh
+
+# Or setup the tools (sbt) yourself and run:
+service/gradlew -p service build 
+cd spark-container/streaming && sbt assembly
+```
+
+### (Option 1) Running with docker compose
 
 When you have the containers up and running you can access the webshop 
 through [localhost:9011](http://localhost:9011/). 
@@ -90,12 +133,30 @@ through [localhost:9011](http://localhost:9011/).
 > These ports should be available: 9011, 8080, 8081, 9200, 9300, 8290, 9092, 2181, 6379, 8989
 
 ```bash
-service/gradlew -p service build && (cd spark-container/streaming && sbt assembly) && docker-compose up -d --build
+# note: make sure the jar's have been build
+
+docker-compose up -d --build
 ```
 
-#### Download new products
+### (Option 2) Running with Kubernetes 
 
-Optionally you can download new image-data from flickr.
+```bash
+# note: make sure the jar's have been build
+
+# Create docker images
+docker-compose build
+
+# Register all services
+kubectl apply -f k8s
+```
+
+### Initial Data
+
+> Note: Data will be loaded automatically, after all services are started.
+
+#### Download new products (optional)
+
+You can download new image-data from flickr. These are stored in `catalog-builder/categories` folder.
 
 > Note: you need to fill in your own Flickr Api key, and wait a very long time...!
 
@@ -114,21 +175,4 @@ docker run --rm -it \
         --key ${FLICKR_API_KEY}"
 ```
 
-#### Loading products
-The first time you start the docker composition, you have to load the product catalog, like this:
-
-```text
-docker run -it --rm --volume $PWD:/divolte-shop \
-  --workdir /divolte-shop \
-  --network host \
-  python:3.6 \
-  bash -c 'pip install requests && python catalog-builder/put-categories.py \
-                            data/categories/animals.json \
-                            data/categories/architecture.json \
-                            data/categories/cars.json \
-                            data/categories/cities.json \
-                            data/categories/flowers.json \
-                            data/categories/landscape.json \
-                            data/categories/nautical.json'
-```
 Go to [localhost:9011](http://localhost:9011/).
