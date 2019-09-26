@@ -200,6 +200,10 @@ services:
       context: .
       dockerfile: ./catalog-builder/Dockerfile
     container_name: catalog-builder
+    environment:
+      SHOP_API_URL: "http://shop-api:8080/api"
+    depends_on:
+      - shop-api
 
 
   # divolte-druid:
