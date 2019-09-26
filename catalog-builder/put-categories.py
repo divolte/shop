@@ -5,6 +5,8 @@ from functools import reduce
 from collections import Counter
 
 import requests
+from requests.exceptions import ConnectionError
+from retrying import retry
 
 
 def make_item(json, filename):
@@ -60,6 +62,9 @@ def with_price(item, min_favs, max_favs):
     return result
 
 
+@retry(stop_max_attempt_number=10,
+       wait_fixed=1000,       # wait 1 sec
+       retry_on_exception=lambda e: isinstance(e, ConnectionError))
 def _requests_put_json(url, data):
     headers = {'Content-Type': 'application/json'}
     return requests.put(url, data=data, headers=headers)
