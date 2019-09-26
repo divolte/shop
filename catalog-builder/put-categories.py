@@ -60,6 +60,11 @@ def with_price(item, min_favs, max_favs):
     return result
 
 
+def _requests_put_json(url, data):
+    headers = {'Content-Type': 'application/json'}
+    return requests.put(url, data=data, headers=headers)
+
+
 def main(args):
     print('Items from:\n\t%s' % '\n\t'.join(args.files))
 
@@ -79,10 +84,10 @@ def main(args):
 
     responses = Counter()
     for item in items.values():
-        r = requests.put(
+        r = _requests_put_json(
             args.api_base_url + '/catalog/item',
-            data=json.dumps(item),
-            headers={'Content-Type': 'application/json'})
+            data=json.dump(item)
+        )
         print('PUT %s, %d' % (item['id'], r.status_code))
         if r.status_code != 200:
             print(json.dumps(item))
