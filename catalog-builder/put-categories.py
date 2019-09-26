@@ -1,10 +1,10 @@
 import argparse
-import requests
 import json
 import os
-
 from functools import reduce
 from collections import Counter
+
+import requests
 
 
 def make_item(json, filename):
