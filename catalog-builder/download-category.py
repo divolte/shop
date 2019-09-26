@@ -147,7 +147,9 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Create a JSON description of a set of images retrieved from the Flickr API based on keyword searches.')
     parser.add_argument('--key', '-k', metavar='API_KEY', type=str, required=True, help='The Flickr API key to use.')
-    parser.add_argument('--dest', '-d', metavar='DEST', type=str, help='The output directory to store the jsons', default="data/categories")
+    parser.add_argument('--dest', '-d', metavar='DEST', type=str, help='The output directory to '
+                                                                       'store the jsons',
+                        default="catalog-builder/categories")
     parser.add_argument('--searches', '-s', metavar='SEARCH_KEYWORD', type=str, required=True, default='categories.yml',
                         help='Yaml file containing the categories and keywords to search for.')
     parser.add_argument('--fav-threshold', '-t', metavar='FAVOURITES_THRESHOLD', type=int, default=30,

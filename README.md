@@ -125,7 +125,7 @@ service/gradlew -p service build
 cd spark-container/streaming && sbt assembly
 ```
 
-### Running with docker compose
+### (Option 1) Running with docker compose
 
 When you have the containers up and running you can access the webshop 
 through [localhost:9011](http://localhost:9011/). 
@@ -138,9 +138,25 @@ through [localhost:9011](http://localhost:9011/).
 docker-compose up -d --build
 ```
 
+### (Option 2) Running with Kubernetes 
+
+```bash
+# note: make sure the jar's have been build
+
+# Create docker images
+docker-compose build
+
+# Register all services
+kubectl apply -f k8s
+```
+
+### Initial Data
+
+> Note: Data will be loaded automatically, after all services are started.
+
 #### Download new products (optional)
 
-You can download new image-data from flickr. These are stored in `data/categories` folder.
+You can download new image-data from flickr. These are stored in `catalog-builder/categories` folder.
 
 > Note: you need to fill in your own Flickr Api key, and wait a very long time...!
 
@@ -159,21 +175,4 @@ docker run --rm -it \
         --key ${FLICKR_API_KEY}"
 ```
 
-#### Loading products
-The first time you start the docker composition, you have to load the product catalog, like this:
-
-```text
-docker run -it --rm --volume $PWD:/divolte-shop \
-  --workdir /divolte-shop \
-  --network host \
-  python:3.6 \
-  bash -c 'pip install requests retrying && python catalog-builder/put-categories.py \
-                            data/categories/animals.json \
-                            data/categories/architecture.json \
-                            data/categories/cars.json \
-                            data/categories/cities.json \
-                            data/categories/flowers.json \
-                            data/categories/landscape.json \
-                            data/categories/nautical.json'  
-```
 Go to [localhost:9011](http://localhost:9011/).

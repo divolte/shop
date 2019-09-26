@@ -56,13 +56,13 @@ To load the data from the data/catalog directory into elasticsearch the `catalog
 
 ```
 python put-catagories.py \
-  ../data/categories/animals.json \
-  ../data/categories/architecture.json \
-  ../data/categories/cars.json \
-  ../data/categories/cities.json \
-  ../data/categories/flowers.json \
-  ../data/categories/landscape.json \
-  ../data/categories/nautical.json
+  categories/animals.json \
+  categories/architecture.json \
+  categories/cars.json \
+  categories/cities.json \
+  categories/flowers.json \
+  categories/landscape.json \
+  categories/nautical.json
 ```
 
 ## Running the webapp

@@ -197,8 +197,7 @@ services:
 
   catalog-builder:
     build:
-      context: .
-      dockerfile: ./catalog-builder/Dockerfile
+      context: ./catalog-builder
     container_name: catalog-builder
     environment:
       SHOP_API_URL: "http://shop-api:8080/api"
