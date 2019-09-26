@@ -6,7 +6,7 @@ spec:
   template:
     spec:
       # Cleans job after it has completed only works when 
-      # '--feture-gate="TTLAfterFinished=True"' is set in kubernetes config
+      # '--feature-gate="TTLAfterFinished=True"' is set in kubernetes config
       ttlSecondsAfterFinished: 100
       containers:
       - env:
