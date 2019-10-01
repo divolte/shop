@@ -83,18 +83,18 @@ There are two possible ways to achieve it:
   
 This script will build the components through a docker image without requiring any additional software installation your system.
   
-	  ```bash
-	  # You can use the utility script, build inside a dockers containers:
-	  $ bash build-jars.sh
-	  ```
+```bash
+# You can use the utility script, build inside a dockers containers:
+$ bash build-jars.sh
+```
 
 </details>
 
 <details><summary>Manually build through installed tools</summary>
 
 For this procedure, the following package(s) are required:
-	- `sbt`
-	- `ingress-nginx`
+- `sbt`
+- `ingress-nginx`
 
 
 Install with your package manager:
@@ -152,8 +152,7 @@ These, however, will be pulled from a public regsitry:
 ```bash
 ### (Option 1) Running with docker compose
 
-When you have the containers up and running you can access the webshop 
-through [localhost:9011](http://localhost:9011/). 
+When you have the containers up and running you can access the webshop through (http://localhost:9011/). 
 
 > These ports should be available: 9011, 8080, 8081, 9200, 9300, 8290, 9092, 2181, 6379, 8989
 
