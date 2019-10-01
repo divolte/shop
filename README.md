@@ -125,6 +125,20 @@ Each component runs in a container, which can be orchestrated by either
 - Kubernetes
 
 
+We are going to build these images locally:
+
+- shop/docker-divolte
+- shop/docker-shop-service
+- shop/docker-shop-webapp
+
+These, however, will be pulled from a public regsitry:
+
+- redis
+- docker.elastic.co/elasticsearch/elasticsearch
+- krisgeus/docker-kafka 
+
+
+
 ### (Option 1) Running with Docker-Compose
 
 The easiest way to get started is with Docker Compose.
@@ -134,18 +148,6 @@ Make sure you have Docker running locally. You can download a proper version at 
 We are running a couple of containers, and the default size is not large enough. Boost the ram of Docker to at **least 4GB**,
 otherwise you will run into startup problems (Exit with code: 137) when running the `docker-compose up` command.
 
-We are going to build these images locally:
-
-- shop/docker-divolte
-- shop/docker-shop-service
-- shop/docker-shop-webapp
-
-
-These, however, will be pulled from a public regsitry:
-
-- redis
-- docker.elastic.co/elasticsearch/elasticsearch
-- krisgeus/docker-kafka 
 
 [ds]:https://store.docker.com/
 
@@ -164,7 +166,7 @@ $ docker-compose up -d --build
 
 ### (Option 2) Running with Kubernetes 
 
-Unlike Docker-Compose, Kubernetes actually expects the images to have been built and available. So you must create them first.
+Unlike Docker-Compose, Kubernetes actually expects the images to have been built a-priori. So you must do so first.
 
 **You must have Kubernetes running locally**
 
