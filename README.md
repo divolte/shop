@@ -43,14 +43,61 @@ This application comprises a number of different processes:
 ```
 
 ## Prerequisite(s)
+### Ingress Nginx
 
-The following package(s) are required;
+Our setup uses an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) with Nginx to define reroutes to the webshop and the
+API (aka service) used by the webshop. The following steps 
+are required:
 
-	- `sbt`;
-    - and `ingress-nginx`.
+For all deployments:
+```bash
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+```
+
+Provider specific:
+
+**For Docker for mac**
+```bash
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
+```
+
+**For minikube**
+```bash
+$ minikube addons enable ingress
+```
+
+For more info, see [here](https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/index.md#installation-guide).
+
+
+## Building the project
+
+Two components are written in languages which require compilation:
+- service
+- spark-container
+
+You must first build **jars** from the source-code, before you can wrap them into docker containers.
+
+There are two possible ways to achieve it:
+
+<details><summary>Build using a utility script</summary>
+  
+This script will build the components through a docker image without requiring any additional software installation your system.
+  
+	  ```bash
+	  # You can use the utility script, build inside a dockers containers:
+	  $ bash build-jars.sh
+	  ```
+
+</details>
+
+<details><summary>Manually build through installed tools</summary>
+
+For this procedure, the following package(s) are required:
+	- `sbt`
+	- `ingress-nginx`
+
 
 Install with your package manager:
-
 ```
 brew update
 brew install sbt
@@ -59,50 +106,42 @@ brew install sbt
 ```
 apt update
 apt install sbt 
-```
+```	
 
-### Ingress Nginx
 
-Our setup uses an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) with Nginx to define reroutes to the webshop and the
-API (aka service) used by the webshop. The following steps 
-are required:
+And run the compilation commands:
+```bash
+service/gradlew -p service build 
+cd spark-container/streaming && sbt assembly
+```	
 
-For all deployments:
+</details>
 
-```
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
-```
 
-Provider specific:
+## Running the project
 
-**For Docker for mac**
-```
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
-```
+Each component runs in a container, which can be orchestrated by either
+- Docker compose
+- Kubernetes
 
-**For minikube**
-```
-minikube addons enable ingress
-```
 
-For more info, see [here](https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/index.md#installation-guide).
-
-## Running with Docker
+### (Option 1) Running with Docker-Compose
 
 The easiest way to get started is with Docker Compose.
 
 Make sure you have Docker running locally. You can download a proper version at the [Docker Store][ds].
 
-We are running a couple of containers, and the default size is not large enough. Boost the ram of Docker to at least 4GB,
+We are running a couple of containers, and the default size is not large enough. Boost the ram of Docker to at **least 4GB**,
 otherwise you will run into startup problems (Exit with code: 137) when running the `docker-compose up` command.
 
-We are going to build these containers locally:
+We are going to build these images locally:
 
 - shop/docker-divolte
 - shop/docker-shop-service
 - shop/docker-shop-webapp
 
-We will use these public containers:
+
+These, however, will be pulled from a public regsitry:
 
 - redis
 - docker.elastic.co/elasticsearch/elasticsearch
@@ -110,21 +149,7 @@ We will use these public containers:
 
 [ds]:https://store.docker.com/
 
-### Building Project Jars (required)
-
-Build **jars** from the source-code, before you can wrap them into docker containers for:
-- service
-- spark-container
-
 ```bash
-# You can use the utility script, build inside a dockers containers:
-bash build-jars.sh
-
-# Or setup the tools (sbt) yourself and run:
-service/gradlew -p service build 
-cd spark-container/streaming && sbt assembly
-```
-
 ### (Option 1) Running with docker compose
 
 When you have the containers up and running you can access the webshop 
@@ -132,23 +157,28 @@ through [localhost:9011](http://localhost:9011/).
 
 > These ports should be available: 9011, 8080, 8081, 9200, 9300, 8290, 9092, 2181, 6379, 8989
 
-```bash
 # note: make sure the jar's have been build
 
-docker-compose up -d --build
+$ docker-compose up -d --build
 ```
 
+
 ### (Option 2) Running with Kubernetes 
+
+Unlike Docker-Compose, Kubernetes actually expects the images to have been built and available. So you must create them first.
+
+**You must have Kubernetes running locally**
 
 ```bash
 # note: make sure the jar's have been build
 
 # Create docker images
-docker-compose build
+$ docker-compose build
 
 # Register all services
-kubectl apply -f k8s
+$ kubectl apply -f k8s
 ```
+
 
 ### Initial Data
 
