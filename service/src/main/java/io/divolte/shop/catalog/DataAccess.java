@@ -21,6 +21,7 @@ public final class DataAccess {
 
     public final static String CATALOG_INDEX = "catalog";
     public final static String ITEM_DOCUMENT_TYPE = "item";
+    public final static String COMPLETE_TITLE_FIELD = "complete_title";
 
     public static CatalogItemResource.Item sourceToItem(final String json) {
         final DocumentContext parsed = JsonPath.parse(json);
@@ -45,6 +46,7 @@ public final class DataAccess {
         final CatalogItemResource.Item item = new CatalogItemResource.Item(parsed.read("$.id"),
                 parsed.read("$.categories"),
                 parsed.read("$.title"),
+                parsed.read("$.complete_title"),
                 parsed.read("$.description"),
                 parsed.read("$.tags"),
                 parsed.read("$.favs"),

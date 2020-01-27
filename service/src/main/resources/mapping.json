@@ -8,6 +8,10 @@
       "type": "text",
       "analyzer": "catalog"
     },
+    "complete_title": {
+      "type": "completion",
+      "analyzer": "catalog"
+    },
     "description": {
       "type": "text",
       "analyzer": "catalog"

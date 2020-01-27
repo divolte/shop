@@ -1,30 +1,10 @@
 package io.divolte.shop.catalog;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jackson.JsonSnakeCase;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -33,6 +13,22 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
+import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/api/catalog/item")
@@ -84,6 +80,7 @@ public class CatalogItemResource {
 
             @Override
             public void onFailure(Exception e) {
+                e.printStackTrace();
                 response.resume(e);
             }
         });
@@ -94,6 +91,7 @@ public class CatalogItemResource {
         builder.startObject()
                 .field("id", item.id)
                 .field("title", item.title)
+                .field("complete_title", item.completeTitle)
                 .field("description", item.description)
                 .field("tags", item.tags)
                 .field("categories", item.categories)
@@ -130,6 +128,7 @@ public class CatalogItemResource {
         public final @NotEmpty @Pattern(regexp = ID_REGEXP) String id;
         public final @NotEmpty List<String> categories;
         public final String title;
+        public final String completeTitle;
         public final String description;
         public final List<String> tags;
         public final int favs;
@@ -142,6 +141,7 @@ public class CatalogItemResource {
                 @JsonProperty("id") final String id,
                 @JsonProperty("categories") final List<String> categories,
                 @JsonProperty("title") final String title,
+                @JsonProperty("complete_title") final String completeTitle,
                 @JsonProperty("description") final String description,
                 @JsonProperty("tags") final List<String> tags,
                 @JsonProperty("favs") final int favs,
@@ -152,6 +152,7 @@ public class CatalogItemResource {
             this.price = price;
             this.categories = ImmutableList.copyOf(nel(categories));
             this.title = title;
+            this.completeTitle = completeTitle;
             this.description = description;
             this.tags = ImmutableList.copyOf(nel(tags));
             this.favs = favs;
