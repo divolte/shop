@@ -1,12 +1,9 @@
 import argparse
 import logging
 
-import numpy as np
-import redis
-from flask import abort
 from flask import Flask
 
-from config import ITEM_HASH_KEY, CLICK_KEY_PREFIX, IMPRESSION_KEY_PREFIX
+from recommender import BanditModel
 
 
 class Bandit(Flask):
@@ -18,54 +15,24 @@ class Bandit(Flask):
 
     More info: https://lazyprogrammer.me/bayesian-bandit-tutorial/
 
-    :param redis_host: Redis host
-    :param redis_port: Redis port
-    :param prior: Uninformative prior for number of hits and misses
+    :param model: recommender.BanditModel
     :param kwargs: Keyword arguments for Flask superclass
     """
-    def __init__(self, redis_host, redis_port, prior=1, **kwargs):
+    def __init__(self, model, **kwargs):
 
         super().__init__(**kwargs)
-
-        self.log = logging.getLogger(__name__)
+        self.logger = logging.getLogger(__name__)
+        self.model = model
         self.add_url_rule('/item', view_func=self.item, methods=['GET'])
-        self.redis = redis.StrictRedis(host=redis_host, port=redis_port)
-        self.prior = prior
 
     def item(self):
-        items, clicks, impressions = self._query_current()
-        theta = self._sample_success_rate(clicks, impressions)
-        if len(theta) > 0:
-            winner = items[theta.argmax()]
-            self.log.info('Found winner %s out of %d items',
-                          winner, len(items))
-            return winner
-        else:
-            self.log.warning('Did not find any winners out of %d items.',
-                             len(items))
-            return abort(404)
-
-    def _query_current(self):
-        statistics = self.redis.hgetall(ITEM_HASH_KEY)
-        items = np.unique([k[2:] for k in statistics.keys()])
-        clicks = np.array([
-            int(statistics.get(CLICK_KEY_PREFIX + k, 0)) for k in items
-        ])
-        impressions = np.array([
-            int(statistics.get(IMPRESSION_KEY_PREFIX + k, 0)) for k in items
-        ])
-        return items, clicks, impressions
-
-    def _sample_success_rate(self, clicks, impressions):
-        """Sample from Bernoulli likelihood with non-informative prior."""
-        hits = clicks + self.prior
-        misses = np.maximum(impressions - clicks, 0) + self.prior
-        return np.random.beta(hits, misses)
+        return self.model.item()
 
 
 def main(args):
     redis_host, redis_port = args.redis.split(':')
-    bandit = Bandit(redis_host, redis_port, import_name=__name__)
+    model = BanditModel(redis_host, redis_port)
+    bandit = Bandit(model, import_name=__name__)
     bandit.run(args.address, int(args.port), args.debug)
 
 

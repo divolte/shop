@@ -3,6 +3,7 @@ import logging
 import requests
 import redis
 import numpy as np
+from flask import abort
 
 from config import (
     ITEM_HASH_KEY, CLICK_KEY_PREFIX, IMPRESSION_KEY_PREFIX,
@@ -48,6 +49,24 @@ class Model:
         misses = np.maximum(impressions - clicks, 0) + self.prior
         return np.random.beta(hits, misses)
 
+
+class BanditModel(Model):
+
+    def __init__(self, redis_host, redis_port, prior=1):
+        super().__init__(redis_host, redis_port, prior)
+
+    def item(self):
+        items, clicks, impressions = self._query_current()
+        theta = self._sample_success_rate(clicks, impressions)
+        if len(theta) > 0:
+            winner = items[theta.argmax()]
+            self.logger.info('Found winner %s out of %d items',
+                          winner, len(items))
+            return winner
+        else:
+            self.logger.warning('Did not find any winners out of %d items.',
+                             len(items))
+            return abort(404)
 
 class ConsumerModel(Model):
     """Model that saves clicks & impressions and generates new experiments.
