@@ -30,6 +30,7 @@ class Bandit(Flask):
 
 
 def main(args):
+    """ Initialize the bandit service. """
     redis_host, redis_port = args.redis.split(':')
     model = BanditModel(redis_host, redis_port)
     bandit = Bandit(model, import_name=__name__)

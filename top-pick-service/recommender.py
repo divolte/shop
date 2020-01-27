@@ -12,7 +12,9 @@ from config import (
 
 
 class Model:
-    """Bandit API that serves items from Redis.
+    """
+    Base Bandit model that inspect the current status and samples
+    click rates.
 
     Bayesian bandit API that serves the photo with highest estimated click
     rate. Hits (=clicks) and misses (=impressions without clicks) are
@@ -23,7 +25,6 @@ class Model:
     :param redis_host: Redis host
     :param redis_port: Redis port
     :param prior: Uninformative prior for number of hits and misses
-    :param kwargs: Keyword arguments for Flask superclass
     """
     def __init__(self, redis_host, redis_port, prior=1):
 
@@ -51,7 +52,19 @@ class Model:
 
 
 class BanditModel(Model):
+    """
+    Bandit Model that returns recommendations from Redis.
 
+    Bayesian bandit API that serves the photo with highest estimated click
+    rate. Hits (=clicks) and misses (=impressions without clicks) are
+    registered by the top-pick-consumer and saved in Redis.
+
+    More info: https://lazyprogrammer.me/bayesian-bandit-tutorial/
+
+    :param redis_host: Redis host
+    :param redis_port: Redis port
+    :param prior: Uninformative prior for number of hits and misses
+    """
     def __init__(self, redis_host, redis_port, prior=1):
         super().__init__(redis_host, redis_port, prior)
 
@@ -67,6 +80,7 @@ class BanditModel(Model):
             self.logger.warning('Did not find any winners out of %d items.',
                              len(items))
             return abort(404)
+
 
 class ConsumerModel(Model):
     """Model that saves clicks & impressions and generates new experiments.
