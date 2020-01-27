@@ -1,3 +1,7 @@
+"""
+Bandit implementation with extra methods to interact with databases,
+shared by the consumer and the bandit services.
+"""
 import logging
 
 import requests
@@ -27,8 +31,7 @@ class Model:
     :param prior: Uninformative prior for number of hits and misses
     """
     def __init__(self, redis_host, redis_port, prior=1):
-
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(str(self.__class__))
         self.redis = redis.StrictRedis(host=redis_host, port=redis_port)
         self.prior = prior
 
@@ -66,6 +69,7 @@ class BanditModel(Model):
     :param prior: Uninformative prior for number of hits and misses
     """
     def __init__(self, redis_host, redis_port, prior=1):
+        self.logger = logging.getLogger(str(self.__class__))
         super().__init__(redis_host, redis_port, prior)
 
     def item(self):
@@ -103,7 +107,7 @@ class ConsumerModel(Model):
         super().__init__(redis_host, redis_port, prior)
         self.elastic_host = elastic_host
         self.elastic_port = elastic_port
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(str(self.__class__))
         self.n_items_ = 0
 
     def click(self, product_id):

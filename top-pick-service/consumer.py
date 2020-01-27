@@ -1,3 +1,6 @@
+"""
+Main component of the toppick-consumer service.
+"""
 import argparse
 import io
 import logging
@@ -27,7 +30,7 @@ class Consumer:
             schema = avro.schema.Parse(f.read())
         self.reader = avro.io.DatumReader(schema)
         self.model = model
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(str(self.__class__))
 
     def start(self, topic, client_id, group_id, bootstrap_servers):
         consumer = KafkaConsumer(topic, client_id=client_id, group_id=group_id,

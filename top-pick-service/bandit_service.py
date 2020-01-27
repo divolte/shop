@@ -1,3 +1,6 @@
+"""
+Flask app that serves the recommendation, main component of the toppick-bandit service.
+"""
 import argparse
 import logging
 
@@ -21,7 +24,7 @@ class Bandit(Flask):
     def __init__(self, model, **kwargs):
 
         super().__init__(**kwargs)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(str(self.__class__))
         self.model = model
         self.add_url_rule('/item', view_func=self.item, methods=['GET'])
 
