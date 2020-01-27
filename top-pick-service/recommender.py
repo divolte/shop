@@ -11,6 +11,45 @@ from config import (
 
 
 class Model:
+    """Bandit API that serves items from Redis.
+
+    Bayesian bandit API that serves the photo with highest estimated click
+    rate. Hits (=clicks) and misses (=impressions without clicks) are
+    registered by the top-pick-consumer and saved in Redis.
+
+    More info: https://lazyprogrammer.me/bayesian-bandit-tutorial/
+
+    :param redis_host: Redis host
+    :param redis_port: Redis port
+    :param prior: Uninformative prior for number of hits and misses
+    :param kwargs: Keyword arguments for Flask superclass
+    """
+    def __init__(self, redis_host, redis_port, prior=1):
+
+        self.logger = logging.getLogger(__name__)
+        self.redis = redis.StrictRedis(host=redis_host, port=redis_port)
+        self.prior = prior
+
+    def _query_current(self):
+        statistics = self.redis.hgetall(ITEM_HASH_KEY)
+        items = np.unique([k[2:] for k in statistics.keys()])
+        clicks = np.array([
+            int(statistics.get(CLICK_KEY_PREFIX + k, 0)) for k in items
+        ])
+        impressions = np.array([
+            int(statistics.get(IMPRESSION_KEY_PREFIX + k, 0)) for k in items
+        ])
+        return items, clicks, impressions
+
+    def _sample_success_rate(self, clicks, impressions):
+        """Sample from Bernoulli likelihood with non-informative prior."""
+        # TODO: not yet very informative with a low experiment count
+        hits = clicks + self.prior
+        misses = np.maximum(impressions - clicks, 0) + self.prior
+        return np.random.beta(hits, misses)
+
+
+class ConsumerModel(Model):
     """Model that saves clicks & impressions and generates new experiments.
 
     A new experiments consist of a sequence of impressions. In an experiment,
@@ -28,11 +67,10 @@ class Model:
 
     def __init__(self, elastic_host, elastic_port, redis_host, redis_port,
                  prior=1):
+        super().__init__(redis_host, redis_port, prior)
         self.elastic_host = elastic_host
         self.elastic_port = elastic_port
-        self.redis = redis.StrictRedis(redis_host, redis_port)
         self.logger = logging.getLogger(__name__)
-        self.prior = prior
         self.n_items_ = 0
 
     def click(self, product_id):
@@ -69,27 +107,9 @@ class Model:
                          len(new_items), len(items), len(random))
         self._start_new_experiment(new_items)
 
-    def _query_current(self):
-        statistics = self.redis.hgetall(ITEM_HASH_KEY)
-        items = np.unique([k[2:] for k in statistics.keys()])
-        clicks = np.array([
-            int(statistics.get(CLICK_KEY_PREFIX + k, 0)) for k in items
-        ])
-        impressions = np.array([
-            int(statistics.get(IMPRESSION_KEY_PREFIX + k, 0)) for k in items
-        ])
-        return items, clicks, impressions
-
     def _get_top(self, items, clicks, impressions, n_top):
         p_success = self._sample_success_rate(clicks, impressions)
         return items[p_success.argsort()[-n_top:]]
-
-    def _sample_success_rate(self, clicks, impressions):
-        """Sample from Bernoulli likelihood with non-informative prior."""
-        # TODO: This isn't that informative with current low experiment count.
-        hits = clicks + self.prior
-        misses = np.maximum(impressions - clicks, 0) + self.prior
-        return np.random.beta(hits, misses)
 
     def _query_random_items(self, count):
         query = {

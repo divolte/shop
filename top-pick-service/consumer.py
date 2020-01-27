@@ -9,7 +9,7 @@ import redis
 import requests
 from kafka import KafkaConsumer
 
-from recommender import Model
+from recommender import ConsumerModel
 from config import (
     ITEM_HASH_KEY, CLICK_KEY_PREFIX, IMPRESSION_KEY_PREFIX,
     EXPERIMENT_COUNT_KEY
@@ -87,7 +87,7 @@ def parse_args():
 def main(args):
     elastic_host, elastic_port = args.elasticsearch.split(':')
     redis_host, redis_port = args.redis.split(':')
-    model = Model(elastic_host, elastic_port, redis_host, redis_port)
+    model = ConsumerModel(elastic_host, elastic_port, redis_host, redis_port)
     model.refresh_items()
     consumer = Consumer(args.schema, model)
     consumer.start(args.topic, args.client, args.group, args.brokers)
