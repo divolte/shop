@@ -29,6 +29,14 @@ class Bandit(Flask):
         self.add_url_rule('/item', view_func=self.item, methods=['GET'])
 
     def item(self):
+        """
+        Return the id of the recommended item.
+
+        Return
+        ------
+        item_id: str
+            id of the recommended item.
+        """
         return self.model.item()
 
 

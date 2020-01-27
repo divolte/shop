@@ -73,16 +73,28 @@ class BanditModel(Model):
         super().__init__(redis_host, redis_port, prior)
 
     def item(self):
+        """
+        Return the id of the recommended item.
+
+        Return
+        ------
+        item_id: str
+            id of the recommended item.
+        """
         items, clicks, impressions = self._query_current()
         theta = self._sample_success_rate(clicks, impressions)
-        if len(theta) > 0:
+        if theta:
             winner = items[theta.argmax()]
-            self.logger.info('Found winner %s out of %d items',
-                          winner, len(items))
+            self.logger.info(
+                'Found winner %s out of %d items',
+                winner, len(items)
+            )
             return winner
         else:
-            self.logger.warning('Did not find any winners out of %d items.',
-                             len(items))
+            self.logger.warning(
+                'Did not find any winners out of %d items.',
+                len(items)
+            )
             return abort(404)
 
 
@@ -111,6 +123,9 @@ class ConsumerModel(Model):
         self.n_items_ = 0
 
     def click(self, product_id):
+        """
+        Increase the click counter for the given product.
+        """
         self.redis.hincrby(
             ITEM_HASH_KEY,
             CLICK_KEY_PREFIX + ascii_bytes(product_id),
@@ -118,6 +133,9 @@ class ConsumerModel(Model):
         )
 
     def impression(self, product_id):
+        """
+        Increase the impression counter for the given product.
+        """
         p = self.redis.pipeline()
         p.incr(EXPERIMENT_COUNT_KEY)
         p.hincrby(
