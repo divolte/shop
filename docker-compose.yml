@@ -76,8 +76,17 @@ services:
     environment:
       DIVOLTE_KAFKA_BROKER_LIST: kafka:9092
       DIVOLTE_CONF_DIR: /etc/shop/divolte
+      DIVOLTE_HDFS_ENABLED: "true"
+      DIVOLTE_HDFS_SINK_WORKING_DIR: /tmp/processing
+      DIVOLTE_HDFS_SINK_PUBLISH_DIR: /tmp/finished
+      DIVOLTE_HDFS_SINK_SYNC_NR_OF_RECORDS: 1000
+      DIVOLTE_HDFS_SINK_SYNC_DURATION: 5 minutes
+      DIVOLTE_HDFS_SINK_ROLL_DURATION: 15 minutes
     ports:
       - 8290:8290
+    volumes:
+      - ${PWD}/data/generate/mount-data/finished:/tmp/finished
+      - ${PWD}/data/generate/mount-data/processing:/tmp/processing
     depends_on:
       - kafka
     links:
