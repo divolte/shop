@@ -14,5 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY start-consumer.sh ./
 COPY consumer.py ./
 COPY ShopEventRecord.avsc ./
+COPY config.py ./
+COPY recommender.py ./
 
 CMD [ "/usr/src/app/start-consumer.sh" ]

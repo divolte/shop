@@ -12,6 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY start-bandit.sh ./
 COPY bandit_service.py ./
+COPY config.py ./
+COPY recommender.py ./
 
 EXPOSE 8989
 
