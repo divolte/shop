@@ -66,6 +66,9 @@ build/
 .idea/
 out/
 
+# VS Code
+.vscode/
+
 # Eclipse.
 .project
 .classpath
