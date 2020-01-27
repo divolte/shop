@@ -6,10 +6,7 @@ import redis
 from flask import abort
 from flask import Flask
 
-
-ITEM_HASH_KEY = 'items'
-CLICK_KEY_PREFIX = b'c|'
-IMPRESSION_KEY_PREFIX = b'i|'
+from config import ITEM_HASH_KEY, CLICK_KEY_PREFIX, IMPRESSION_KEY_PREFIX
 
 
 class Bandit(Flask):
