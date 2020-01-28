@@ -40,10 +40,8 @@ public class CompletionResource {
     @GET
     public void complete(@QueryParam("prefix") final String prefix, @Suspended final AsyncResponse response) {
         try {
-
             SearchResponse searchResponse = this.getCompletionSuggestions(prefix);
             response.resume(new CompletionResponse(searchResponse));
-
         } catch (IOException ex) {
             response.resume(ex);
         }

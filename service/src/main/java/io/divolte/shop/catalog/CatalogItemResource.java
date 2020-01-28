@@ -80,7 +80,6 @@ public class CatalogItemResource {
 
             @Override
             public void onFailure(Exception e) {
-                e.printStackTrace();
                 response.resume(e);
             }
         });

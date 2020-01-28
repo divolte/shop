@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 
-      <!-- Suppress favicon for now -->
+    <!-- Suppress favicon for now -->
     <link rel="icon" href="/static/divolte_icon.ico" type="image/x-icon">
 
     <link href="/static/css/app.css" rel="stylesheet">
@@ -32,12 +32,12 @@
     <![endif]-->
   </head>
   <body>
-  {% block data %}
-    <script>
-      var data = {
-        shopper: '{{ shopper }}'
-      }
-    </script>
+    {% block data %}
+      <script>
+        var data = {
+          shopper: '{{ shopper }}'
+        }
+      </script>
     {% end %}
 
     {% block header %}
