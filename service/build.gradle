@@ -29,8 +29,8 @@ shadowJar {
 build.dependsOn shadowJar
 
 dependencies {
-    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.0'
-    compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: '6.4.0'
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.5.2'
+    compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: '7.5.2'
     compile group: 'com.google.guava', name: 'guava', version: '24.0-jre'
     compile group: 'io.dropwizard', name: 'dropwizard-core', version: '1.2.3'
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
