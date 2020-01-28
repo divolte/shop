@@ -1,7 +1,11 @@
+""" Insert records into the transactions PostgreSQL database, with sqlalchemy."""
 import sqlalchemy
 
 
-engine = sqlalchemy.create_engine('postgresql://postgres:password@localhost:5432/postgres')
+def get_engine(username, password):
+    """ Return a sqlalchemy engine with the given username and password. """
+    address = 'postgresql://{}:{}@localhost:5432/postgres'.format(username, password)
+    return sqlalchemy.create_engine(address)
 
 
 def insert_item_record_query(record: dict) -> str:
@@ -14,9 +18,7 @@ def insert_item_record_query(record: dict) -> str:
 
 
 def insert_item_records(records: list, engine: sqlalchemy.engine.base.Engine):
-    """
-    Insert a row per item bought in the pastorders table.
-    """
+    """ Insert a row per item bought in the pastorders table. """
     with engine.connect() as connection:
         for record in records:
             _ = connection.execute(insert_item_record_query(record))

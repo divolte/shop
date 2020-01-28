@@ -21,16 +21,3 @@ def parse_checkout(checkout_dict: dict):
         this_dict = parse_item(item)
         this_dict['user_email'] = email
         yield this_dict
-
-
-if __name__ == '__main__':
-    bisto = {
-        'email': 'ag@gdd.com',
-        'basket': {
-            'items': [
-                {'id': '12', 'price': 1},
-                {'id': '23', 'price': 2}
-            ]
-        }
-    }
-    print(list(parse_checkout(bisto)))
