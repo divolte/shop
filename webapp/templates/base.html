@@ -8,11 +8,13 @@
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- Typeahead suggestion dropdown styling -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 
-    <!-- Suppress favicon for now -->
+      <!-- Suppress favicon for now -->
     <link rel="icon" href="/static/divolte_icon.ico" type="image/x-icon">
 
     <link href="/static/css/app.css" rel="stylesheet">
@@ -30,7 +32,7 @@
     <![endif]-->
   </head>
   <body>
-    {% block data %}
+  {% block data %}
     <script>
       var data = {
         shopper: '{{ shopper }}'
@@ -52,12 +54,11 @@
     {% end %}
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-{#    <script#}
-{#            src="https://code.jquery.com/jquery-3.4.1.min.js"#}
-{#            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="#}
-{#            crossorigin="anonymous"></script>#}
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-    <script src="http://twitter.github.io/typeahead.js/releases/0.11.1/typeahead.jquery.js"></script>
+
+    <!-- Typeahed for search box suggestions -->
+    <script src="http://twitter.github.io/typeahead.js/releases/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="/static/js/typeahed.js"></script>
   </body>
 </html>
