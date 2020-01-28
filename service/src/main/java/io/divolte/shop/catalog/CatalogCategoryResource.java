@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response.Status;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -89,10 +90,10 @@ public class CatalogCategoryResource {
     }
 
     private void searchAsync(@PathParam("name") String name, @DefaultValue("0") @QueryParam("page") int page, @Suspended AsyncResponse response, SearchRequest searchRequest) {
-        client.searchAsync(searchRequest, new ActionListener<SearchResponse>() {
+        client.searchAsync(searchRequest, RequestOptions.DEFAULT, new ActionListener<SearchResponse>() {
             @Override
             public void onResponse(SearchResponse searchResponse) {
-                if (searchResponse.getHits().totalHits == 0) {
+                if (searchResponse.getHits().getTotalHits().value == 0) {
                     response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
                 } else {
                     final List<Item> items = StreamSupport
@@ -100,7 +101,7 @@ public class CatalogCategoryResource {
                             .map(SearchHit::getSourceAsString)
                             .map(DataAccess::sourceToItem)
                             .collect(Collectors.toList());
-                    response.resume(new Category(name, page, searchResponse.getHits().getHits().length, searchResponse.getHits().totalHits, items));
+                    response.resume(new Category(name, page, searchResponse.getHits().getHits().length, searchResponse.getHits().getTotalHits().value, items));
 
                 }
             }

@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response.Status;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -60,8 +61,8 @@ public class BasketResource {
                 .map((b) -> new HashSet<Item>(b.items))
                 .orElseGet(() -> new HashSet<Item>());
 
-        GetRequest getRequest = new GetRequest(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, itemId);
-        client.getAsync(getRequest, new ActionListener<GetResponse>() {
+        GetRequest getRequest = new GetRequest(DataAccess.CATALOG_INDEX, itemId);
+        client.getAsync(getRequest, RequestOptions.DEFAULT, new ActionListener<GetResponse>() {
             @Override
             public void onResponse(GetResponse getResponse) {
                 if (getResponse.isSourceEmpty()) {

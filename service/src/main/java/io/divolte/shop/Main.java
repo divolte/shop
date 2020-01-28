@@ -19,9 +19,9 @@ import javax.servlet.FilterRegistration.Dynamic;
 import org.apache.http.HttpHost;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
+
+import org.elasticsearch.client.*;
+import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.common.settings.Settings;
 
 import com.google.common.io.Resources;
@@ -49,7 +49,7 @@ public class Main extends Application<ServiceConfiguration> {
     }
 
     private void createIndexesIfNotExists(RestHighLevelClient client) throws ElasticsearchException, IOException {
-        if (client.getLowLevelClient().performRequest("HEAD", DataAccess.CATALOG_INDEX).getStatusLine().getStatusCode() != 200) {
+        if (client.getLowLevelClient().performRequest(new Request("HEAD", DataAccess.CATALOG_INDEX)).getStatusLine().getStatusCode() != 200) {
             CreateIndexRequest createRequest = new CreateIndexRequest(DataAccess.CATALOG_INDEX);
             createRequest.settings(Settings.builder()
                     .loadFromSource(
@@ -58,12 +58,11 @@ public class Main extends Application<ServiceConfiguration> {
                     .build()
             );
             createRequest.mapping(
-                    DataAccess.ITEM_DOCUMENT_TYPE,
                     Resources.toString(Resources.getResource("mapping.json"), StandardCharsets.UTF_8),
                     XContentType.JSON
             );
 
-            client.indices().create(createRequest);
+            client.indices().create(createRequest, RequestOptions.DEFAULT);
         }
     }
 

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestHighLevelClient;
 
@@ -23,7 +24,7 @@ public class ElasticSearchHealthCheck extends HealthCheck {
     @Override
     protected Result check() throws Exception {
         try {
-            Response response = esClient.getLowLevelClient().performRequest("GET", DataAccess.CATALOG_INDEX + "/_count");
+            Response response = esClient.getLowLevelClient().performRequest(new Request("GET", DataAccess.CATALOG_INDEX + "/_count"));
 
             try (InputStream is = response.getEntity().getContent()) {
                 Map<String, Object> map = XContentHelper.convertToMap(XContentType.JSON.xContent(), is, true);
