@@ -3,16 +3,18 @@ package io.divolte.shop.catalog;
 import static io.divolte.shop.catalog.DataAccess.BASKETS;
 import static io.divolte.shop.catalog.DataAccess.CHECKOUTS;
 import static io.divolte.shop.catalog.DataAccess.COMPLETED_CHECKOUTS;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.divolte.shop.catalog.BasketResource.Basket;
 import io.dropwizard.jackson.JsonSnakeCase;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -31,6 +33,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -161,7 +165,30 @@ public class CheckoutResource {
                 .get();
             
             if (updatedCheckout.valid) {
+                // Store in 'database' which is implemented as a Map
                 COMPLETED_CHECKOUTS.put(updatedCheckout.id, updatedCheckout);
+                // Send Buy-event to Kafka
+
+                try {
+                    Properties config = new Properties();
+                    config.put("client.id", InetAddress.getLocalHost().getHostName());
+                    config.put("bootstrap.servers", "kafka:9092");
+                    config.put("acks", "all");
+                    KafkaProducer kafkaProducer = new KafkaProducer(config);
+                    // To Json:
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    byte[] payload = objectMapper.writeValueAsBytes(updatedCheckout);
+
+                    final ProducerRecord record = new ProducerRecord("completed-checkout", updatedCheckout.id, payload);
+                    kafkaProducer.send(record);  // ASync send
+
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+
+
             }
             CHECKOUTS.put(shopperId, updatedCheckout);
             

@@ -29,6 +29,7 @@ shadowJar {
 build.dependsOn shadowJar
 
 dependencies {
+    compile group: 'org.apache.kafka', name: 'kafka_2.12', version: '2.4.0'
     compile group: 'org.elasticsearch', name: 'elasticsearch', version: '6.4.0'
     compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: '6.4.0'
     compile group: 'com.google.guava', name: 'guava', version: '24.0-jre'
