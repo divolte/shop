@@ -206,7 +206,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - './past-orders-service/init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql'
+      - './completed-checkouts-service/init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql'
   # divolte-druid:
   #   # image: fokkodriesprong/docker-druid
   #   image: shop/divolte-druid
