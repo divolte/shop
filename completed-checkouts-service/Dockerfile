@@ -1,6 +1,7 @@
 # Pinned to Python 3.6, because KafkaConsumer uses the async keyword. This is a reserved keyword in py3.7!
 # This has to be finished.
 FROM python:3.6
+LABEL version="0.1"
 
 ENV PSQL_HOST_PORT ${PSQL_HOST_PORT:-localhost:5432}
 ENV KAFKA_BROKERS ${KAFKA_BROKERS:-localhost:9092}
