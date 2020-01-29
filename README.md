@@ -42,26 +42,7 @@ This application comprises a number of different processes:
                      +
 ```
 
-## Prerequisite(s)
-
-The following package(s) are required;
-
-	- `sbt`;
-    - and `ingress-nginx`.
-
-Install with your package manager:
-
-```
-brew update
-brew install sbt
-```
-
-```
-apt update
-apt install sbt 
-```
-
-### Ingress Nginx
+## Kubernetes: Ingress Nginx
 
 Our setup uses an [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) with Nginx to define reroutes to the webshop and the
 API (aka service) used by the webshop. The following steps 
@@ -87,7 +68,7 @@ minikube addons enable ingress
 
 For more info, see [here](https://github.com/kubernetes/ingress-nginx/blob/master/docs/deploy/index.md#installation-guide).
 
-## Running with Docker
+## Using docker containers
 
 The easiest way to get started is with Docker Compose.
 
@@ -102,7 +83,6 @@ We are going to build these containers locally:
 - shop/docker-shop-service
 - shop/docker-shop-webapp
 
-We will use these public containers:
 
 - redis
 - docker.elastic.co/elasticsearch/elasticsearch
