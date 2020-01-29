@@ -20,7 +20,6 @@ public final class DataAccess {
     }
 
     public final static String CATALOG_INDEX = "catalog";
-    public final static String ITEM_DOCUMENT_TYPE = "item";
 
     public static CatalogItemResource.Item sourceToItem(final String json) {
         final DocumentContext parsed = JsonPath.parse(json);

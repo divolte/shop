@@ -33,6 +33,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.elasticsearch.client.RequestOptions;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/api/catalog/item")
@@ -48,19 +49,17 @@ public class CatalogItemResource {
     @Path("{id}")
     @GET
     public void getItem(@Pattern(regexp = ID_REGEXP) @PathParam("id") final String id, @Suspended final AsyncResponse response) {
-        GetRequest getRequest = new GetRequest(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, id);
-        client.getAsync(getRequest, new ActionListener<GetResponse>() {
+        GetRequest getRequest = new GetRequest(DataAccess.CATALOG_INDEX, id);
+        client.getAsync(getRequest, RequestOptions.DEFAULT, new ActionListener<GetResponse>() {
             @Override
             public void onResponse(GetResponse getResponse) {
                 if (getResponse.isSourceEmpty()) {
                     response.resume(Response.status(Status.NOT_FOUND).entity("Not found.").build());
                 } else {
                     // We perform our own JSON parsing, because the ES
-                    // JSON
-                    // objects are pretty much useless API-wise.
-                final Item item = DataAccess.sourceToItem(getResponse.getSourceAsString());
-                response.resume(item);
-
+                    // JSON objects are pretty much useless API-wise.
+                    final Item item = DataAccess.sourceToItem(getResponse.getSourceAsString());
+                    response.resume(item);
                 }
             }
 
@@ -74,9 +73,11 @@ public class CatalogItemResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @PUT
     public void putItem(@Valid final Item item, @Suspended final AsyncResponse response) throws IOException {
-        IndexRequest indexRequest = new IndexRequest(DataAccess.CATALOG_INDEX, DataAccess.ITEM_DOCUMENT_TYPE, item.id);
+        IndexRequest indexRequest = new IndexRequest(DataAccess.CATALOG_INDEX);
+        indexRequest.id(item.id);
         indexRequest.source(itemToContentBuilder(item));
-        client.indexAsync(indexRequest, new ActionListener<IndexResponse>() {
+
+        client.indexAsync(indexRequest, RequestOptions.DEFAULT, new ActionListener<IndexResponse>() {
             @Override
             public void onResponse(IndexResponse indexResponse) {
                 response.resume(item);
