@@ -31,10 +31,14 @@ class Consumer:
         )
         for message in consumer:
             parsed_message = self._parse_message(message)
-            self._store_checkout(parsed_message)
+            store_outcome = self._store_checkout(parsed_message)
+            self.logger.log('Checkout stored with output {}'.format(store_outcome))
 
     def _parse_message(self, message):
+        self.logger.log('Parsing a message:')
+        self.logger.log('Message: {}'.format(message.value.decode('utf-8')))
         json_dict = json.load(message.value)
+        self.logger.log('Parser message: \n {}'.format(json_dict))
         return parse_checkout(json_dict)
 
     def _store_checkout(self, records):
@@ -44,7 +48,7 @@ class Consumer:
 
 
 def parse_args():
-
+    """ Ok Pylint, I am documenting this self-describing function. """
     def utf8_bytes(string):
         return bytes(string, 'utf-8')
 
@@ -79,6 +83,15 @@ def parse_args():
 
 
 def main(args):
+    """
+    Parameters
+    ----------
+    args.postgres: str
+    args.topic: str
+    args.client: str
+    args.group: str
+    args.brokers: str
+    """
     postgres_host, postgres_port = args.postgres.split(':')
     consumer = Consumer(postgres_host, postgres_port)
     consumer.start(args.topic, args.client, args.group, args.brokers)

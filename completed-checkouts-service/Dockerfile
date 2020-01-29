@@ -13,6 +13,5 @@ RUN python -m pip install --upgrade pip && pip install --no-cache-dir -r require
 
 COPY start-past-orders.sh ./
 COPY *.py ./
-COPY BuyEventRecord.avsc ./
 
 CMD [ "/usr/src/app/start-past-orders.sh" ]
