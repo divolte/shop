@@ -15,6 +15,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -35,6 +36,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -167,35 +171,47 @@ public class CheckoutResource {
             if (updatedCheckout.valid) {
                 // Store in 'database' which is implemented as a Map
                 COMPLETED_CHECKOUTS.put(updatedCheckout.id, updatedCheckout);
+
                 // Send Buy-event to Kafka
-
-                try {
-                    Properties config = new Properties();
-                    config.put("client.id", InetAddress.getLocalHost().getHostName());
-                    config.put("bootstrap.servers", "kafka:9092");
-                    config.put("acks", "all");
-                    KafkaProducer kafkaProducer = new KafkaProducer(config);
-                    // To Json:
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    byte[] payload = objectMapper.writeValueAsBytes(updatedCheckout);
-
-                    final ProducerRecord record = new ProducerRecord("completed-checkout", updatedCheckout.id, payload);
-                    kafkaProducer.send(record);  // ASync send
-
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-
-
+                sendCheckoutCompletedEvent(updatedCheckout);
             }
             CHECKOUTS.put(shopperId, updatedCheckout);
             
             response.resume(updatedCheckout);
         }
     }
-    
+
+    /**
+     * Send an async JSON event to Kafka topic 'completed-checkout'
+     */
+    private void sendCheckoutCompletedEvent(Checkout updatedCheckout) {
+        try {
+            // TODO: Move Kafka config into general settings.
+            Properties config = new Properties();
+            config.put("client.id", InetAddress.getLocalHost().getHostName());
+            config.put("bootstrap.servers", "kafka:9092");
+            config.put("acks", "all");
+
+            KafkaProducer<String, byte[]> kafkaProducer = new KafkaProducer<>(config,
+                    new StringSerializer(),
+                    new ByteArraySerializer()  // TODO: Use a JsonSerializer of type Checkout instead.
+            );
+
+            // TODO: Create (expensive) ObjectMapper once.
+            // When the JsonSerializer is implemetned, the Objectmapper is not needed anymore.
+            ObjectMapper objectMapper = new ObjectMapper();
+            byte[] payload = objectMapper.writeValueAsBytes(updatedCheckout);
+
+            final ProducerRecord<String, byte[]> record = new ProducerRecord<>("completed-checkout", updatedCheckout.id, payload);
+
+            // Async send
+            Future<RecordMetadata> send = kafkaProducer.send(record);
+            // Optionally block for success.
+        } catch (UnknownHostException | JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Path("inflight/{shopperId}")
     @DELETE
     public void finalizeCheckout(
