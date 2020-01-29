@@ -83,7 +83,7 @@ class BanditModel(Model):
         """
         items, clicks, impressions = self._query_current()
         theta = self._sample_success_rate(clicks, impressions)
-        if theta.size == 0:
+        if theta.size > 0:
             winner = items[theta.argmax()]
             self.logger.info(
                 'Found winner %s out of %d items',
