@@ -2,7 +2,7 @@
 Extrapolate info from the checkout dictionary used in the basket of the webapp.
 """
 
-def parse_item(item_dict: dict) -> dict:
+def _parse_item(item_dict: dict) -> dict:
     """
     Item dictionaries are found in the Python list checkout['basket']['items'].
     """
@@ -18,6 +18,6 @@ def parse_checkout(checkout_dict: dict):
     """
     email = checkout_dict['email']
     for item in checkout_dict['basket']['items']:
-        this_dict = parse_item(item)
+        this_dict = _parse_item(item)
         this_dict['user_email'] = email
         yield this_dict

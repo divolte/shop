@@ -2,9 +2,9 @@
 import sqlalchemy
 
 
-def get_engine(username, password):
+def get_engine(host, port, username, password):
     """ Return a sqlalchemy engine with the given username and password. """
-    address = 'postgresql://{}:{}@localhost:5432/checkouts'.format(username, password)
+    address = f'postgresql://{username}:{password}@{host}:{port}/checkouts'
     return sqlalchemy.create_engine(address)
 
 

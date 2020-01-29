@@ -3,8 +3,12 @@ Main component of the toppick-consumer service.
 """
 import argparse
 import logging
+import json
 
 from kafka import KafkaConsumer
+
+from .records_parser import parse_checkout
+from .postgres_interface import insert_item_records, get_engine
 
 
 class Consumer:
@@ -30,10 +34,13 @@ class Consumer:
             self._store_checkout(parsed_message)
 
     def _parse_message(self, message):
-        return message
+        json_dict = json.load(message.value)
+        return parse_checkout(json_dict)
 
-    def _store_checkout(self, message):
-        pass
+    def _store_checkout(self, records):
+        # TODO: find best practice to replace this
+        engine = get_engine(self.postgres_host, self.postgres_port, 'psadmin', 'qwertyuiop')
+        return insert_item_records(records, engine)
 
 
 def parse_args():
