@@ -3,7 +3,7 @@ services:
   past-orders-db:
     image: postgres:12-alpine
     environment:
-      POSTGRES_DB: transactions
+      POSTGRES_DB: checkouts
       POSTGRES_USER: psadmin
       POSTGRES_PASSWORD: qwertyuiop
     ports:
