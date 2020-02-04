@@ -3,7 +3,7 @@ $(document).ready(function() {
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('suggestion'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: 'http://localhost:8080/api/complete?prefix=%QUERY',
+            url: '//localhost:8080/api/complete?prefix=%QUERY',
             wildcard: '%QUERY',
             transform: function(searchesResponse) {
                 return searchesResponse.searches;

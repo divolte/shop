@@ -3,6 +3,7 @@ package io.divolte.shop;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -19,7 +20,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -39,15 +39,24 @@ public class CompletionResource {
 
     @GET
     public void complete(@QueryParam("prefix") final String prefix, @Suspended final AsyncResponse response) {
-        try {
-            SearchResponse searchResponse = this.getCompletionSuggestions(prefix);
-            response.resume(new CompletionResponse(searchResponse));
-        } catch (IOException ex) {
-            response.resume(ex);
-        }
+
+        esClient.searchAsync(getCompletionSuggestionsRequest(prefix), DEFAULT,
+
+                new ActionListener<SearchResponse>() {
+                    @Override
+                    public void onResponse(SearchResponse searchResponse) {
+                        response.resume(new CompletionResponse(searchResponse));
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        response.resume(e);
+                    }
+                }
+        );
     }
 
-    public SearchResponse getCompletionSuggestions(final String prefix) throws IOException {
+    public SearchRequest getCompletionSuggestionsRequest(final String prefix) {
         SearchRequest searchRequest = new SearchRequest(CATALOG_INDEX);
         CompletionSuggestionBuilder suggestBuilder = new CompletionSuggestionBuilder(COMPLETE_TITLE_FIELD);
 
@@ -60,7 +69,7 @@ public class CompletionResource {
         sourceBuilder.suggest(new SuggestBuilder().addSuggestion("suggestion", suggestBuilder));
         searchRequest.source(sourceBuilder);
 
-        return esClient.search(searchRequest, DEFAULT);
+        return searchRequest;
     }
 
     public static final class CompletionResponse {
