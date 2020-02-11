@@ -20,7 +20,6 @@ public final class DataAccess {
     }
 
     public final static String CATALOG_INDEX = "catalog";
-    public final static String ITEM_DOCUMENT_TYPE = "item";
     public final static String COMPLETE_TITLE_FIELD = "complete_title";
 
     public static CatalogItemResource.Item sourceToItem(final String json) {
