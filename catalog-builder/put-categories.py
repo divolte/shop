@@ -11,6 +11,7 @@ def make_item(json, filename):
     return {
         'id': json['id'],
         'title': json['title'],
+        'complete_title': json['title'],
         'description': json['info']['description'],
         'tags': json['info']['tags'],
         'favs': json['favs'],

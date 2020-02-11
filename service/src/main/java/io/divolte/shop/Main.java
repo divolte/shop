@@ -44,6 +44,7 @@ public class Main extends Application<ServiceConfiguration> {
         environment.jersey().register(new CatalogCategoryResource(client));
         environment.jersey().register(new BasketResource(client));
         environment.jersey().register(new CheckoutResource());
+        environment.jersey().register(new CompletionResource(client));
 
         environment.healthChecks().register("ElasticSearch", new ElasticSearchHealthCheck(client));
     }

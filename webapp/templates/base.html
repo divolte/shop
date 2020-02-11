@@ -8,6 +8,8 @@
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- Typeahead suggestion dropdown styling -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js-bootstrap-css/1.2.1/typeaheadjs.min.css">
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -31,11 +33,11 @@
   </head>
   <body>
     {% block data %}
-    <script>
-      var data = {
-        shopper: '{{ shopper }}'
-      }
-    </script>
+      <script>
+        var data = {
+          shopper: '{{ shopper }}'
+        }
+      </script>
     {% end %}
 
     {% block header %}
@@ -54,5 +56,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+    <!-- Typeahed for search box suggestions -->
+    <script src="http://twitter.github.io/typeahead.js/releases/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="/static/js/typeahed.js"></script>
   </body>
 </html>
