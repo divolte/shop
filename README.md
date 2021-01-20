@@ -90,7 +90,8 @@ through [localhost:9011](http://localhost:9011/).
 > These ports should be available: 9011, 8080, 8081, 9200, 9300, 8290, 9092, 2181, 6379, 8989
 
 ```bash
-service/gradlew -p service build && (cd spark-container/streaming && sbt assembly) && docker-compose up -d --build
+# to start/refresh all images use the convenience script
+./refresh
 ```
 
 #### Download new products
@@ -115,20 +116,9 @@ docker run --rm -it \
 ```
 
 #### Loading products
-The first time you start the docker composition, you have to load the product catalog, like this:
+The first time you start the docker composition, you have to load the product catalog with the load-data convenience script, like this:
 
-```text
-docker run -it --rm --volume $PWD:/divolte-shop \
-  --workdir /divolte-shop \
-  --network host \
-  python:3.6 \
-  bash -c 'pip install requests && python catalog-builder/put-categories.py \
-                            data/categories/animals.json \
-                            data/categories/architecture.json \
-                            data/categories/cars.json \
-                            data/categories/cities.json \
-                            data/categories/flowers.json \
-                            data/categories/landscape.json \
-                            data/categories/nautical.json'
+```sh
+./load-data
 ```
 Go to [localhost:9011](http://localhost:9011/).
