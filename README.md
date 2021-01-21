@@ -122,3 +122,22 @@ The first time you start the docker composition, you have to load the product ca
 ./load-data
 ```
 Go to [localhost:9011](http://localhost:9011/).
+
+#### Inspecting the data
+The clickstream-collector by default exposes the events only to kafka.
+
+There is also the possibility to save the events to localstorage.
+For this the followin environment var needs to be set in the docker-compose file
+```
+DIVOLTE_HDFS_ENABLED: "true"
+```
+
+The localstorage data can then be inspected with the following commands:
+
+```bash
+docker-compose exec clickstream-collector ls -l /data
+```
+
+```bash
+docker-compose exec clickstream-collector show-avro
+```

@@ -1,0 +1,99 @@
+version: "3.3"
+services:
+  # elastic container
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    container_name: elastic
+    hostname: elastic
+    domainname: divolte_divolte.io
+    environment:
+      - cluster.name=elasticsearch
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - network.bind_host=0.0.0.0
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - divolte.io
+  # kibana container
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.2
+    container_name: kibana
+    hostname: kibana
+    domainname: divolte_divolte.io
+    environment:
+      SERVER_NAME: kibana.divolte_divolte.io
+      ELASTICSEARCH_HOSTS: http://elastic:9200
+      LOGGING_QUIET: "true"
+    ports:
+      - 5601:5601
+    depends_on:
+      - elastic
+    links:
+      - elastic:elastic
+    networks:
+      - divolte.io
+  # divolte clickstream collector
+  clickstream-collector:
+    build:
+      context: ./divolte
+    container_name: clickstream-collector
+    hostname: clickstream-collector
+    domainname: divolte_divolte.io
+    environment:
+      DIVOLTE_CONF_DIR: /etc/shop/divolte
+      DIVOLTE_KAFKA_ENABLED: "false"
+      DIVOLTE_HDFS_ENABLED: "true"
+    ports:
+      - 8290:8290
+    networks:
+      - divolte.io
+  # divolte shop API for communication with Elastic
+  shop-api:
+    build:
+      context: ./service
+    container_name: shop-api
+    hostname: shop-api
+    domainname: divolte_divolte.io
+    environment:
+      ELASTICSEARCH_HOSTS: "[\"elastic\"]"
+      ELASTICSEARCH_CLUSTER_NAME: elasticsearch
+      JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - 8080:8080
+      - 8081:8081
+    depends_on:
+      - clickstream-collector
+      - elastic
+    links:
+      - clickstream-collector:clickstream-collector
+      - elastic:elastic
+    networks:
+      - divolte.io
+  # container serving the webshop
+  shop-webapp:
+    build:
+      context: ./webapp
+    container_name: shop-webapp
+    hostname: shop-webapp
+    domainname: divolte_divolte.io
+    environment:
+      SHOP_API_URL: "http://shop-api:8080/api"
+      SHOP_DIVOLTE_URL: "//localhost:8290/divolte.js"
+      SHOP_WEBAPP_SECRET: "foo"
+      SHOP_WEBAPP_PORT: 9011
+    ports:
+      - 9011:9011
+    depends_on:
+      - clickstream-collector
+      - shop-api
+    links:
+      - clickstream-collector:clickstream-collector
+      - shop-api:shop-api
+    networks:
+      - divolte.io
+networks:
+  divolte.io:
+    driver: bridge
