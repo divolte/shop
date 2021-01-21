@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -n "{                                
+echo -n "{
   \"elasticsearch_hosts\" : ${ELASTICSEARCH_HOSTS},
   \"elasticsearch_port\": 9200,
   \"elasticsearch_cluster_name\": \"${ELASTICSEARCH_CLUSTER_NAME}\"
@@ -12,7 +12,7 @@ ES_HOSTS_ARR=( ${ES_HOSTS//,/ } )
 WAIT_LOOPS=25
 
 is_ready() {
-  [ $(curl --write-out %{http_code} --silent --output /dev/null http://${ES_HOSTS_ARR[0]}:9200/_cat/health?h=st) == 200 ]
+  [ $(curl --write-out '%{http_code}' --silent --output /dev/null http://${ES_HOSTS_ARR[0]}:9200/_cat/health?h=st) -eq 200 ]
 }
 
 i=0
