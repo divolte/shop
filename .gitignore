@@ -84,3 +84,6 @@ flask_secret
 # Maven
 dependency-reduced-pom.xml
 pom.xml.versionsBackup
+
+# Elasticsearch externalized data directory
+elastic/data
