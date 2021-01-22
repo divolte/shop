@@ -15,6 +15,9 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+    # If you want to access the raw index data it might be good to externalize the data directory.
+    # volumes:
+    #   - ./elastic/data:/usr/share/elasticsearch/data
     networks:
       - divolte.io
   # kibana container
