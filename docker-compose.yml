@@ -73,6 +73,7 @@ services:
     hostname: clickstream-collector
     domainname: divolte_divolte.io
     environment:
+      DIVOLTE_HDFS_ENABLED: "false"
       DIVOLTE_KAFKA_BROKER_LIST: kafka:9092
       DIVOLTE_CONF_DIR: /etc/shop/divolte
     ports:

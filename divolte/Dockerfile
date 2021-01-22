@@ -6,13 +6,21 @@
 
 FROM divolte/divolte-collector
 
+# Create a system account so we don't have to run with root privileges.
+RUN useradd -d /opt/divolte -r divolte
+
 ENV DIVOLTE_CONF_DIR ${DIVOLTE_CONF_DIR:-/etc/shop/divolte}
 
 RUN mkdir -p /etc/shop
 
-ADD schema/src/main/docker/divolte-collector.conf /etc/shop/divolte/divolte-collector.conf
-ADD schema/src/main/groovy/mapping.groovy /etc/shop/divolte/mapping.groovy
-ADD schema/src/main/resources/ShopEventRecord.avsc /etc/shop/divolte/ShopEventRecord.avsc
-RUN chown root:root /etc/shop/divolte/*
+# Create the data directory and set permissions for the divolte user.
+RUN mkdir -p /data/inflight && \
+    chown divolte:users -R /data/ && \
+    chmod -R 755 /data/
 
+COPY show-avro /usr/local/bin/
+
+COPY --chown=root:root schema/src/main/docker/divolte-collector.conf schema/src/main/groovy/mapping.groovy schema/src/main/resources/ShopEventRecord.avsc /etc/shop/divolte/
+
+USER divolte
 EXPOSE 8290

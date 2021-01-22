@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Refresh the stack based on local changes.
+#
+
+# Abort on first error.
+set -e
+
+PROGNAME="${0##*/}"
+PROGDIR="${0%/*}"
+cd "${PROGDIR}"
+
+# Some simple steps:
+# 1. Bring down all services
+# 2. "rm" the kafka container since it doesn't cope well with restarts.
+docker-compose down
+docker-compose rm -f kafka

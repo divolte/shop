@@ -12,8 +12,7 @@ cd "${PROGDIR}"
 
 # Some simple steps:
 # 1a. Build spark project
-# 1b. Build everything else (docker containers).
-# 2. "up" the stack, which will restart changed images.
+# 2a. Build everything else (docker containers).
+# 2b. "up" the stack, which will restart changed images.
 (cd spark-container/streaming && sbt assembly)
-docker-compose build
-docker-compose up --detach
+docker-compose up --build --detach
