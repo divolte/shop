@@ -16,7 +16,7 @@ https://github.com/divolte/divolte-collector/issues/483
 
 ## Click on 1 photo in a category
 
-go to localhost:9011 and chosse a category and click a single image
+go to localhost:9011 and choose a category and click a single image
 
 this should result in 3 pageview messages in the `foo` topic and 3 in the `bar` topic
 
